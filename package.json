@@ -4,11 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "compile": "tsc server.ts",
+    "dev": "npm run compile && nodemon server.js"
   },
   "keywords": [],
   "author": "mikistrus@gmail.com",
-  "type": "commonjs",
+  "type": "module",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
