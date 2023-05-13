@@ -26,10 +26,6 @@ app.get('/auth', auth, (req, res) => {
     res.send('ok')
 })
 
-app.get('/token', (req, res) => {
-
-})
-
 io.on("connection", socket => {
     socket.emit('welcome', socket.id)
     socket.join('room1');
