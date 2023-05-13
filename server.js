@@ -1,5 +1,6 @@
-import express from "express";
-import { Server } from "socket.io";
+const express = require("express");
+const socket = require("socket.io");
+const auth = require("./middleware/authorization");
 
 const PORT = 3000;
 const app = express();
@@ -8,15 +9,25 @@ const options = {
     origin: ['http://localhost:5173']
 }
 
+app.use(require('./controllers/users'));
+
 const server = app.listen(PORT, () => {
     console.log('server is started')
 })
 
-const io = new Server(server, options);
+const io = socket(server, options);
 
 
 app.get('/', (req, res) => {
     res.send('ok')
+})
+
+app.get('/auth', auth, (req, res) => {
+    res.send('ok')
+})
+
+app.get('/token', (req, res) => {
+
 })
 
 io.on("connection", socket => {
