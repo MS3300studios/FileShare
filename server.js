@@ -1,21 +1,27 @@
 const express = require("express");
 const socket = require("socket.io");
 const auth = require("./middleware/authorization");
+const cors = require("cors");
+require('dotenv').config()
 
 const PORT = 3000;
 const app = express();
-const options = {
+const socketCorsOptions = {
     cors: true,
     origin: ['http://localhost:5173']
 }
+const serverCorsOptions = {
+    origin: "http://localhost:5173"
+}
 
 app.use(require('./controllers/users'));
+app.use(cors(serverCorsOptions));
 
 const server = app.listen(PORT, () => {
     console.log('server is started')
 })
 
-const io = socket(server, options);
+const io = socket(server, socketCorsOptions);
 
 
 app.get('/', (req, res) => {

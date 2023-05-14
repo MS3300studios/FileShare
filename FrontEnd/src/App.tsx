@@ -1,12 +1,24 @@
+import * as React from "react";
 import Navigation from './components/navigation/nav';
 import LandingPage from './components/landingPage/landingPage';
 import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AddFile from './components/addFile/addFile';
 import { Login } from './components/login/login';
+import { initializeIcons } from '@fluentui/react';
+initializeIcons();
+import { getToken } from './utils/getToken';
+const token = getToken(); 
 
 function App() {
-  const isLoggedIn = false;
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+  React.useEffect(() => {
+    fetch(`http://localhost:3000/users/verifyToken/${token}`).then(resp => {
+      if(resp.status === 200) 
+        setIsLoggedIn(true)
+    })
+  }, [])
 
   return (
     <BrowserRouter>

@@ -30,3 +30,13 @@
     bottom: 20px;
     left: 0px;
 }
+
+.notificationContainer{
+    border: 3px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 500;
+    width: 200px;
+}
