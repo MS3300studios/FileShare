@@ -15,6 +15,7 @@ const serverCorsOptions = {
 }
 
 app.use(require('./controllers/users'));
+app.use(require('./controllers/contacts'));
 app.use(cors(serverCorsOptions));
 
 const server = app.listen(PORT, () => {

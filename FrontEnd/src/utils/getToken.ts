@@ -3,6 +3,6 @@ export const getToken = () => {
     if(token){
         return token;
     }
-    token = localStorage.getItem("token");
+    token = localStorage.getItem("token") || "no token";
     return token;
 }

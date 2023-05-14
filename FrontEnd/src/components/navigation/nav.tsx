@@ -2,10 +2,10 @@ import styles from "./nav.module.css";
 import profile from "../../assets/youngWomanProfilePic.jpg";
 import { Dropdown, DropdownMenuItemType, IDropdownOption } from '@fluentui/react/lib/Dropdown';
 import { PrimaryButton } from "@fluentui/react";
-import { Link, redirect } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 export default function Navigation(){
-    
+    const navigate = useNavigate();
     const options: IDropdownOption[] = [
       { key: 'profileHeader', text: 'Your profile', itemType: DropdownMenuItemType.Header },
       { key: 'view', text: 'Go to your profile' },
@@ -18,14 +18,19 @@ export default function Navigation(){
     ];
 
     const onDropdownSelectChange = (item?: IDropdownOption): void => {
-        if(!item)
-            return;
-        console.log(item)
+        if(!item) return;
         switch (item.key) {
             case "upload":
-                redirect("/file/add");
+                navigate("/file/add");
                 break;
-        
+            case "logout":
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.reload();
+                break;
+            case "contacts":
+                navigate("/contacts");
+                break;
             default:
                 break;
         }

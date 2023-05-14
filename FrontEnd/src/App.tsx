@@ -8,6 +8,7 @@ import { Login } from './components/login/login';
 import { initializeIcons } from '@fluentui/react';
 initializeIcons();
 import { getToken } from './utils/getToken';
+import Contacts from "./components/contacts/contacts";
 const token = getToken(); 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
             <Routes>
               <Route path='/' index element={<LandingPage />} />
               <Route path='/file/add' element={<AddFile />} />
+              <Route path='/contacts' element={<Contacts />} />
             </Routes>
             </>
           ) : <Login />

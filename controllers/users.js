@@ -9,20 +9,19 @@ router.use(cors());
 router.use(express.json({limit: '10mb'}));
 router.use(express.urlencoded({limit: '10mb', extended: true}));
 
-const User = require("../models/User");
+const User = require("../models/User").User;
+const Contacts = require("../models/ContactsList");
 
 router.get('/users/verifyToken/:token', (req, res) => {
     try{
         const decoded = jwt.decode(req.params.token, process.env.SECRET);
         const expDate = new Date(decoded.exp * 1000);
         if(expDate > new Date()){
-            console.log('token valid')
             res.sendStatus(200);
             return;
         }
 
         res.sendStatus(401) //token expired
-        console.log('token expired')
     } catch(error){
         return res.sendStatus(401);
     }
@@ -58,6 +57,12 @@ router.post('/users/register', (req, res) => {
         });
 
         user.save().then(() => {
+            const contacts = new Contacts({
+                userId: user._id,
+                contacts: []
+            })
+            contacts.save();
+
             res.sendStatus(201);
         }).catch(err => {
             if(Object.keys(err.keyPattern)[0] === "nickname"){
