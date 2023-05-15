@@ -6,3 +6,37 @@
     width: 100%;
     height: 50vh;
 }
+
+.modalClass{
+    width: 50%;
+    height: 100%;
+    padding: 5px;
+}
+
+.modalHeader{
+    padding: 0px 15px;
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+.peopleContainer{
+    margin: 5px;
+}
+
+.personaContainer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.addPersonIcon{
+    margin-right: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease-out;
+}
+
+.addPersonIcon:hover{
+    background-color: lightblue;
+    border-radius: 5px;
+}
