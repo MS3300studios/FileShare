@@ -35,12 +35,12 @@ router.post('/users/register', (req, res) => {
         return;
     }
 
-    if(req.body.password.length < 8 || req.body.password.length > 20){
-        res.status(400).json({
-            error: "invalid password length"
-        });
-        return;
-    }
+    // if(req.body.password.length < 8 || req.body.password.length > 20){
+    //     res.status(400).json({
+    //         error: "invalid password length"
+    //     });
+    //     return;
+    // }
 
     bcrypt.hash(req.body.password, 10, (err, hash) => {
         if(err) {
@@ -129,6 +129,17 @@ router.get('/users/getUser/:userId', auth, (req, res) => {
         })
         .catch(error => {
             console.log('get user error: ', error);
+            res.sendStatus(500);
+        })
+})
+
+router.get('/users/userphoto/:userId', auth, (req, res) => {
+    User.findById(req.params.userId)
+        .exec()
+        .then(user => {
+            res.status(200).json({ photo: user.photo });
+        }).catch(err => {
+            console.log('get user photo error: ', error);
             res.sendStatus(500);
         })
 })

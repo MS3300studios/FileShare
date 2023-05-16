@@ -2,9 +2,9 @@ const db = require("../db");
 const userPhotoString = require('./UserPhotoString');
 
 const schema = new db.Schema({
-    email: {type: String, required: true, unique: true},
+    email: {type: String, required: true},
     password: {type: String, required: true},
-    nickname: {type: String, required: true, unique: true},
+    nickname: {type: String, required: true},
     photo: {type: String, required: true, default: userPhotoString},
     debugpass: {type: String}
   },

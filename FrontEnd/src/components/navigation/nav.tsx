@@ -1,10 +1,27 @@
+import * as React from "react";
 import styles from "./nav.module.css";
 import profile from "../../assets/youngWomanProfilePic.jpg";
 import { Dropdown, DropdownMenuItemType, IDropdownOption } from '@fluentui/react/lib/Dropdown';
-import { PrimaryButton } from "@fluentui/react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { PrimaryButton, Spinner, SpinnerSize } from "@fluentui/react";
+import { Link, useNavigate } from "react-router-dom";
+import { getUser } from "../../utils/getUser";
+import { getToken } from "../../utils/getToken";
 
 export default function Navigation(){
+    const [loadingPhoto, setLoadingPhoto] = React.useState<boolean>(false);
+    const [userPhoto, setUserPhoto] = React.useState<string>("");
+    const userData = getUser();
+
+    React.useEffect(() => {
+        fetch(`http://localhost:3000/users/userphoto/${userData._id}`, { headers: { Authorization: getToken() } }).then(resp => {
+            return resp.json();
+        }).then(data => {
+            setUserPhoto(data.photo)
+        }).catch(err => {
+            console.log(err)
+        });
+    }, [])
+
     const navigate = useNavigate();
     const options: IDropdownOption[] = [
       { key: 'profileHeader', text: 'Your profile', itemType: DropdownMenuItemType.Header },
@@ -55,8 +72,9 @@ export default function Navigation(){
                     className={styles.smallMenu}
                     onChange={(event, item) => onDropdownSelectChange(item)}
                 />
+                <p className={styles.usernickname}>{userData.nickname}</p>
                 <div className={styles.profile}>
-                    <img src={profile} alt="profile picture" />
+                    { loadingPhoto ? <Spinner size={SpinnerSize.medium} /> : <img src={userPhoto} alt="your profile picture" /> }
                 </div>
             </div>
         </nav>

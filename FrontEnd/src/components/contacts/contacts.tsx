@@ -1,7 +1,7 @@
 import * as React from "react";
 import styles from "./contacts.module.css";
 import { getToken } from "../../utils/getToken";
-import { Modal, Persona, PersonaPresence, PersonaSize, PrimaryButton } from "@fluentui/react";
+import { Check, MessageBar, MessageBarType, Modal, Persona, PersonaPresence, PersonaSize, PrimaryButton, Spinner, SpinnerSize } from "@fluentui/react";
 import { AiOutlineUserAdd } from "react-icons/ai";
 
 interface PersonDTO{
@@ -12,13 +12,23 @@ interface PersonDTO{
 }
 
 export default function Contacts(){
-    const [contacts, setContacts] = React.useState([]);
+    const [contacts, setContacts] = React.useState<PersonDTO[]>();
     const [isLoading, setIsLoading] = React.useState(true);
     const [isModalOpened, setIsModalOpened] = React.useState(false);
     const [loadingPeople, setLoadingPeople] = React.useState(false);
     const [people, setPeople] = React.useState<PersonDTO[]>([]);
+    const [isLoadingRemove, setIsLoadingRemove] = React.useState<string>("");
+
+    const [addedPeople, setAddedPeople] = React.useState<string[]>([]);
+    const [isLoadingAddPerson, setIsLoadingAddPerson] = React.useState<string>(""); //person being loaded ID
+    const [messageBar, setMessageBar] = React.useState({show: false, type: MessageBarType.error, text: "an error occurred"});
 
     React.useEffect(() => {
+        getUserContacts();
+    }, [])
+
+    const getUserContacts = () => {
+        setIsLoading(true);
         fetch(`http://localhost:3000/contacts`, 
             { headers: { Authorization: getToken() } 
         })
@@ -28,7 +38,7 @@ export default function Contacts(){
             setIsLoading(false);
         })
         //CATCH AND DISPLAY CUSTOM ERROR MESSAGE from fluentui
-    }, [])
+    }
 
     const getRandomContacts = () => {
         setLoadingPeople(true);
@@ -43,23 +53,100 @@ export default function Contacts(){
         })
     };
 
-    const addPerson = () => {
+    const addPerson = (personId: string) => {
+        setIsLoadingAddPerson(personId);
 
+        fetch(`http://localhost:3000/contacts/add/${personId}`, 
+            { headers: { Authorization: getToken() } 
+        })
+        .then(resp => {
+            setIsLoadingAddPerson("");
+            setAddedPeople(prev => [...prev, personId]);
+        }).catch(err => {
+            setMessageBar({show: true, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"})
+        });
+    }
+
+    const closeModal = () => {
+        console.log("CLOSE MODAL")
+        getUserContacts();
+        setIsModalOpened(false); 
+        setLoadingPeople(false);
+    }
+
+    const givePermisssions = (userId: string) => {
+        //redirect to url adding permission with user id
+    }
+
+    const redirectToChat = (userId: string) => {
+        //redirect to chat with user id
+    }
+
+    const removeContact = (personId: string) => {
+        console.log(personId)
+        const token = getToken();
+
+        setIsLoadingRemove(personId);
+        fetch(`http://localhost:3000/contacts/remove/${personId}`, 
+            { headers: { Authorization: token } 
+        }).then(resp => {
+            return resp.json()
+        }).then(data => {
+            console.log(data)
+            setIsLoadingRemove("");
+            setContacts(data.contacts)
+        }).catch(err => {
+            setMessageBar({show: true, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"})
+        });
     }
 
     return (
+        <>
+        { contacts?.length !== 0 && <div style={{width: "100%", display: "flex", justifyContent: "center", marginTop: "5px"}}>
+            <PrimaryButton onClick={getRandomContacts}>{loadingPeople ? "Please wait" : "Add contacts"}</PrimaryButton>
+        </div>}
         <div className={styles.container}>
             {
-                isLoading ? <p>loading...</p> : (<>
-                    { contacts.length > 0 ? <h1>CONTACTS</h1> : 
+                isLoading ? <Spinner size={SpinnerSize.large} /> : (<>
+                    { (contacts && contacts.length > 0) ? <>
+                        {
+                            <div style={{width: "80%"}}>
+                            {contacts.map((el, id) => (
+                                <div className={styles.singleContact} key={id}>
+                                    <Persona 
+                                        imageUrl={el.photo}
+                                        text={el.nickname}
+                                        secondaryText={el.email}
+                                        size={PersonaSize.size72}
+                                        presence={PersonaPresence.online}
+                                        imageAlt={`photo of ${el.nickname}`}
+                                    />
+                                    <span>
+                                        <PrimaryButton onClick={() => givePermisssions(el._id)}>Give permissions to this user</PrimaryButton>
+                                        <PrimaryButton onClick={() => redirectToChat(el._id)}>Chat</PrimaryButton>
+                                        <PrimaryButton onClick={() => removeContact(el._id)}>{ isLoadingRemove === el._id ? <Spinner size={SpinnerSize.small} /> : "Remove from Contacts" }</PrimaryButton>
+                                    </span>
+                                </div>
+                            ))}
+                            </div>
+                        }
+                    </> : 
                         <div>
                             <p>You dont have any contacts yet, you can add them here <PrimaryButton onClick={getRandomContacts}>{loadingPeople ? "Please wait" : "Add contacts"}</PrimaryButton></p>
-                            <Modal isOpen={isModalOpened} onDismiss={() => { setIsModalOpened(false); setLoadingPeople(false); }} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
+                            <Modal isOpen={isModalOpened} onDismiss={closeModal} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
                                 <h4 className={styles.modalHeader}>Add new contacts</h4>
+                                { messageBar.show &&
+                                    <>
+                                    <div style={{marginTop: "10px"}}></div>
+                                    <MessageBar messageBarType={messageBar.type}>
+                                        {messageBar.text}
+                                    </MessageBar> 
+                                    </>
+                                }
                                 <div className={styles.peopleContainer}>
                                 {people.map((el, id) => (
-                                    <>
-                                    <div key={id} className={styles.personaContainer}>
+                                    <div key={id}>
+                                    <div className={styles.personaContainer}>
                                         <Persona 
                                             imageUrl={el.photo}
                                             text={el.nickname}
@@ -68,12 +155,19 @@ export default function Contacts(){
                                             presence={PersonaPresence.online}
                                             imageAlt={`photo of ${el.nickname}`}
                                         />
-                                        <div onClick={addPerson} className={styles.addPersonIcon}>
-                                            <AiOutlineUserAdd size={"30px"}/>
+                                        <div onClick={() => addPerson(el._id)} className={styles.addPersonIcon}>
+                                        {
+                                            isLoadingAddPerson === el._id ? <Spinner size={SpinnerSize.large} /> : <>
+                                            {
+                                                addedPeople.indexOf(el._id) !== -1 ? <Check checked /> :
+                                                <AiOutlineUserAdd size={"30px"}/>
+                                            }
+                                            </>
+                                        }
                                         </div>
                                     </div>
                                     { people.length-1 !== id && <hr /> }
-                                    </>
+                                    </div>
                                 ))}
                                 </div>
                             </Modal>
@@ -82,5 +176,6 @@ export default function Contacts(){
                 </>)
             }
         </div>
+        </>
     )
 }
