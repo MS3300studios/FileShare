@@ -89,4 +89,32 @@ router.get('/contacts/remove/:personId', auth, async (req, res) => {
     });
 })
 
+router.get('/contacts/person/:query', auth, (req, res) => {
+    if(req.params.query.indexOf("@") !== -1){
+        User.find({"email": { $regex: req.params.query}}).exec().then(result => {
+            let dtoArray = result.map(el => ({
+                email: el.email,
+                nickname: el.nickname,
+                photo: el.photo,
+                _id: el._id.toString()
+            }))
+
+            dtoArray = dtoArray.filter(el => el._id.toString() !== req.userData.userId)
+            res.status(200).json(dtoArray)
+        })
+    } else {
+        User.find({"nickname": { $regex: req.params.query}}).exec().then(result => {
+            let dtoArray = result.map(el => ({
+                email: el.email,
+                nickname: el.nickname,
+                photo: el.photo,
+                _id: el._id.toString()
+            }))
+
+            dtoArray = dtoArray.filter(el => el._id.toString() !== req.userData.userId)
+            res.status(200).json(dtoArray)
+        })
+    }
+})
+
 module.exports = router;

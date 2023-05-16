@@ -1,7 +1,7 @@
 import * as React from "react";
 import styles from "./contacts.module.css";
 import { getToken } from "../../utils/getToken";
-import { Check, MessageBar, MessageBarType, Modal, Persona, PersonaPresence, PersonaSize, PrimaryButton, Spinner, SpinnerSize } from "@fluentui/react";
+import { Check, MessageBar, MessageBarType, Modal, Persona, PersonaPresence, PersonaSize, PrimaryButton, Spinner, SpinnerSize, TextField } from "@fluentui/react";
 import { AiOutlineUserAdd } from "react-icons/ai";
 
 interface PersonDTO{
@@ -22,6 +22,7 @@ export default function Contacts(){
     const [addedPeople, setAddedPeople] = React.useState<string[]>([]);
     const [isLoadingAddPerson, setIsLoadingAddPerson] = React.useState<string>(""); //person being loaded ID
     const [messageBar, setMessageBar] = React.useState({show: false, type: MessageBarType.error, text: "an error occurred"});
+    const [searchString, setSearchString] = React.useState("");
 
     React.useEffect(() => {
         getUserContacts();
@@ -68,7 +69,7 @@ export default function Contacts(){
     }
 
     const closeModal = () => {
-        console.log("CLOSE MODAL")
+        setSearchString("");
         getUserContacts();
         setIsModalOpened(false); 
         setLoadingPeople(false);
@@ -97,6 +98,23 @@ export default function Contacts(){
             setContacts(data.contacts)
         }).catch(err => {
             setMessageBar({show: true, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"})
+        });
+    }
+
+    const searchForUser = () => {
+        setMessageBar({show: true, type: MessageBarType.info, text: "loading..."})
+        const token = getToken();
+        fetch(`http://localhost:3000/contacts/person/${searchString}`, 
+            { headers: { Authorization: token } 
+        }).then(resp => {
+            return resp.json()
+        }).then(data => {
+            if(data.length === 0) {
+                setMessageBar({show: true, type: MessageBarType.info, text: "no matches were found for this query"})
+                return;
+            }
+            setPeople(data)
+            setMessageBar({show: false, type: MessageBarType.info, text: ""})
         });
     }
 
@@ -135,6 +153,10 @@ export default function Contacts(){
                             <p>You dont have any contacts yet, you can add them here <PrimaryButton onClick={getRandomContacts}>{loadingPeople ? "Please wait" : "Add contacts"}</PrimaryButton></p>
                             <Modal isOpen={isModalOpened} onDismiss={closeModal} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
                                 <h4 className={styles.modalHeader}>Add new contacts</h4>
+                                <div style={{borderBottom: "3px solid black", padding: "5px"}}>
+                                    <TextField label="search for user with nickname or email" onChange={(e) => setSearchString(e.currentTarget.value)} value={searchString} />
+                                    <PrimaryButton style={{marginTop: "5px"}} onClick={searchForUser}>Search</PrimaryButton>
+                                </div>
                                 { messageBar.show &&
                                     <>
                                     <div style={{marginTop: "10px"}}></div>
