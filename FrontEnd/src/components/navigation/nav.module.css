@@ -4,7 +4,6 @@
 
 .navContainer{
     height: 50px;
-    width: 100%;
     background-color: hsla(215, 96%, 41%, 1);
     display: flex;
     justify-content: space-between;

@@ -1,6 +1,5 @@
 import * as React from "react";
 import styles from "./nav.module.css";
-import profile from "../../assets/youngWomanProfilePic.jpg";
 import { Dropdown, DropdownMenuItemType, IDropdownOption } from '@fluentui/react/lib/Dropdown';
 import { PrimaryButton, Spinner, SpinnerSize } from "@fluentui/react";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,7 +7,7 @@ import { getUser } from "../../utils/getUser";
 import { getToken } from "../../utils/getToken";
 
 export default function Navigation(){
-    const [loadingPhoto, setLoadingPhoto] = React.useState<boolean>(false);
+    const [loadingPhoto, setLoadingPhoto] = React.useState<boolean>(true);
     const [userPhoto, setUserPhoto] = React.useState<string>("");
     const userData = getUser();
 
@@ -16,6 +15,7 @@ export default function Navigation(){
         fetch(`http://localhost:3000/users/userphoto/${userData._id}`, { headers: { Authorization: getToken() } }).then(resp => {
             return resp.json();
         }).then(data => {
+            setLoadingPhoto(false);
             setUserPhoto(data.photo)
         }).catch(err => {
             console.log(err)

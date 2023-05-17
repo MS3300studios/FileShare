@@ -1,187 +1,81 @@
 import * as React from "react";
 import styles from "./landingPage.module.css";
 import Card from "./card";
-
-const data = [
-    {
-        name: "Photo1.jpg",
-        size: 1200,
-        uploadedAt: new Date().getDate(),
-        ext: "jpg",
-        docType: "photo"
-    },
-    {
-        name: "Notes.txt",
-        size: 14,
-        uploadedAt: new Date().getDate(),
-        ext: "txt",
-        docType: "text"
-    },
-    {
-        name: "archive.zip",
-        size: 4200,
-        uploadedAt: new Date().getDate(),
-        ext: "zip",
-        docType: "archive"
-    },
-    {
-        name: "information.pdf",
-        size: 2048,
-        uploadedAt: new Date().getDate(),
-        ext: "pdf",
-        docType: "document"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "names.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "infiltration.c",
-        size: 20,
-        uploadedAt: new Date().getDate(),
-        ext: "c",
-        docType: "unknown"
-    },
-    {
-        name: "information.mp3",
-        size: 48,
-        uploadedAt: new Date().getDate(),
-        ext: "mp3",
-        docType: "unknown"
-    }
-]
+import { IFile } from "../addFile/addFile";
+import { Spinner, SpinnerSize } from "@fluentui/react";
+import { getToken } from "../../utils/getToken";
+import { List } from '@fluentui/react/lib/List';
 
 export default function LandingPage(){
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [files, setFiles] = React.useState<IFile[]>([]);
+
+    React.useEffect(() => {
+        fetch(`http://localhost:3000/files`, { headers: { Authorization: getToken() } }).then(resp => {
+            return resp.json();
+        }).then(data => {
+            console.log(data.files)
+
+            setIsLoading(false);
+            setFiles(data.files)
+        }).catch(err => {
+            console.log(err)
+        });
+    }, []);
+
+    const modalHandler = (id: string | undefined) => {
+
+    }
+
     return(
         <main>
-            <h1>Your files</h1>
-            <article>
-                <div className={styles.cardsContainer}>
-                    {data.map((el, index) => {
-                        return (
-                            <Card 
-                                key={index}
-                                name={el.name}
-                                uploadedAt={el.uploadedAt}
-                                docType={el.docType}
-                                ext={el.ext}
-                                size={el.size}
-                            />
-                        )
-                    })}
-                </div>
-            </article>
+            <h1 style={{textAlign: "center"}}>Your files</h1>
+            {
+                isLoading ? <Spinner size={SpinnerSize.large} /> : (
+                    <article>
+                        { files.length === 0 ? <p style={{fontSize: "20px", fontWeight: "500"}}>You don't have any files yet, click the button on the top menu to add files</p> : (
+                            <div className={styles.cardsContainer}>
+                                {/* <List
+                                    className={styles.listGridExample}
+                                    items={files}
+                                    renderedWindowsAhead={4}
+
+                                    onRenderCell={onRenderCell}
+                                /> */}
+                                { files.map((item, id) => (
+                                    <Card 
+                                        key={id}
+                                        id={item._id}
+                                        name={item.name}
+                                        docType={item.type}
+                                        ext={item.extension}
+                                        size={item.size}
+                                        uploadedAt={item.createdAt}
+                                        modalHandler={modalHandler}
+                                    />
+                                )) }
+                            </div>
+                        ) }
+                    </article>
+                )
+            }
         </main>
     )
 } 
 
-// import { List } from '@fluentui/react/lib/List';
-//https://developer.microsoft.com/en-us/fluentui#/controls/web/list
+// const data = [
+//     {
+//         name: "Photo1.jpg",
+//         size: 1200,
+//         uploadedAt: new Date().getDate(),
+//         ext: "jpg",
+//         docType: "photo"
+//     },
+//     {
+//         name: "Notes.txt",
+//         size: 14,
+//         uploadedAt: new Date().getDate(),
+//         ext: "txt",
+//         docType: "text"
+//     }
+// ]
