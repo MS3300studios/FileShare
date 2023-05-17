@@ -14,6 +14,7 @@ export interface IFile{
     extension: string;
     createdAt?: string;
     _id?: string;
+    userId?: string;
 }
 
 export default function AddFile(){

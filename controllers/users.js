@@ -125,7 +125,11 @@ router.get('/users/getUser/:userId', auth, (req, res) => {
     User.findById(req.params.userId)
         .exec()
         .then(user => {
-            console.log(user)
+            res.status(200).json({
+                nickname: user.nickname,
+                photo: user.photo,
+                email: user.email
+            });
         })
         .catch(error => {
             console.log('get user error: ', error);

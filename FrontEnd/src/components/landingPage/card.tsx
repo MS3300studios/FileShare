@@ -1,19 +1,16 @@
 import * as React from "react";
-import styles from "./landingPage.module.css";
-import { BiImageAlt, BiPhotoAlbum } from "react-icons/bi";
-import { AiOutlineFileText, AiFillFileZip, AiOutlineFileExclamation } from "react-icons/ai";
-import { HiDocument } from "react-icons/hi";
 import moment from "moment";
-import { DocumentCard, DocumentCardActivity, DocumentCardPreview, DocumentCardTitle, IDocumentCardPreviewProps } from "@fluentui/react";
+import { DocumentCard, DocumentCardActivity, DocumentCardPreview, DocumentCardTitle, IDocumentCardPreviewProps, Spinner, SpinnerSize } from "@fluentui/react";
 import unknownImage from "../../assets/unknown.png";
 import archiveImage from "../../assets/archive.png";
 import photoImage from "../../assets/photo.png";
 import textImage from "../../assets/text.png";
 import documentImage from "../../assets/document.png";
-import profilePic from "../../assets/youngWomanProfilePic.jpg";
+import { getToken } from "../../utils/getToken";
 
 interface ICardProps{
     id?: string;
+    userId?: string;
     name: string;
     size: number;
     uploadedAt?: string;
@@ -41,7 +38,28 @@ const resolveSrc = (docType: string) => {
     }
 }
 
-export default function Card({ id, name, size, uploadedAt, ext, docType, modalHandler }: ICardProps){
+interface IUser{
+    nickname: string;
+    photo: string;
+    email: string;
+}
+
+export default function Card({ id, userId, name, size, uploadedAt, ext, docType, modalHandler }: ICardProps){
+    const [isLoadingUser, setIsLoadingUser] = React.useState(true);
+    const [user, setUser] = React.useState<IUser>({nickname: "loading", photo: "loading photo", email: "loading"});
+
+    React.useEffect(() => {
+        fetch(`http://localhost:3000/users/getUser/${userId}`,
+            { headers: { Authorization: getToken() } 
+        }).then(resp => resp.json()).then(data => {
+            setIsLoadingUser(false);
+            setUser(data);
+        });
+    }, [])
+
+    if(isLoadingUser)
+        return <Spinner size={SpinnerSize.medium} />
+
     const previewProps: IDocumentCardPreviewProps = {
         previewImages: [
             {
@@ -56,7 +74,7 @@ export default function Card({ id, name, size, uploadedAt, ext, docType, modalHa
             },
         ],
     };
-    const DocumentCardActivityPeople = [{ name: 'Annie Lindqvist', profileImageSrc: profilePic }];
+    const DocumentCardActivityPeople = [{ name: user.nickname, profileImageSrc: user.photo }];
 
     return (
         <DocumentCard
@@ -68,18 +86,7 @@ export default function Card({ id, name, size, uploadedAt, ext, docType, modalHa
                 title={`${name} - ${size} kb`}
                 shouldTruncate
             />
-            <DocumentCardActivity activity={`${uploadedAt}`} people={DocumentCardActivityPeople} />
+            <DocumentCardActivity activity={`${moment(uploadedAt).format('MMMM Do YYYY, h:mm a')}`} people={DocumentCardActivityPeople} />
         </DocumentCard>
     )
-
-    // return (
-    //     <div className={styles.cardContainer}>
-    //         <div className={styles.iconContainer}>
-    //             {resolveSrc(docType)}
-    //         </div>
-    //         <div className={styles.infoContainer}>
-    //             <p>{name}</p>
-    //         </div>
-    //     </div>
-    // )
 }
