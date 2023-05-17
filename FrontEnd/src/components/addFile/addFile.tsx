@@ -113,7 +113,7 @@ export default function AddFile(){
                     />
                 </div>
                 <div className={styles.detailsContainer}>
-                    <TextField label="File name" required value={file?.name} />
+                    <TextField label="File name" required value={file?.name} onChange={(e) => setFile(prev => ({...prev, name: e.currentTarget.value} as any))} />
                     <TextField label="File extension" required value={file?.extension} />
                     <TextField label="File size (kb)" disabled value={`${file?.size ? file?.size : 0}`} />
                     <Dropdown
