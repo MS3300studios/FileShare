@@ -37,20 +37,25 @@ export default function Contacts(){
         .then(data => {
             setContacts(data.contacts);
             setIsLoading(false);
+        }).catch(err => {
+            console.log(err)
+            setMessageBar({show: true, type: MessageBarType.error, text: "an unexpected error occurred. Please try again"})
         })
-        //CATCH AND DISPLAY CUSTOM ERROR MESSAGE from fluentui
     }
 
     const getRandomContacts = () => {
         setLoadingPeople(true);
         fetch(`http://localhost:3000/contacts/people`, 
             { headers: { Authorization: getToken() } 
-        })
-        .then(resp => resp.json())
-        .then((data: PersonDTO[]) => {
+        }).then(resp => {
+            return resp.json()
+        }).then((data: PersonDTO[]) => {
             setPeople(data);
             setLoadingPeople(false);
             setIsModalOpened(true);
+        }).catch(err => {
+            console.log(err)
+            setMessageBar({show: true, type: MessageBarType.error, text: "an unexpected error occurred. Please try again"})
         })
     };
 
@@ -73,6 +78,7 @@ export default function Contacts(){
         getUserContacts();
         setIsModalOpened(false); 
         setLoadingPeople(false);
+        // setAddedPeople([])
     }
 
     const givePermisssions = (userId: string) => {
@@ -84,7 +90,6 @@ export default function Contacts(){
     }
 
     const removeContact = (personId: string) => {
-        console.log(personId)
         const token = getToken();
 
         setIsLoadingRemove(personId);
@@ -117,6 +122,8 @@ export default function Contacts(){
             setMessageBar({show: false, type: MessageBarType.info, text: ""})
         });
     }
+
+
 
     return (
         <>
@@ -151,52 +158,53 @@ export default function Contacts(){
                     </> : 
                         <div>
                             <p>You dont have any contacts yet, you can add them here <PrimaryButton onClick={getRandomContacts}>{loadingPeople ? "Please wait" : "Add contacts"}</PrimaryButton></p>
-                            <Modal isOpen={isModalOpened} onDismiss={closeModal} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
-                                <h4 className={styles.modalHeader}>Add new contacts</h4>
-                                <div style={{borderBottom: "3px solid black", padding: "5px"}}>
-                                    <TextField label="search for user with nickname or email" onChange={(e) => setSearchString(e.currentTarget.value)} value={searchString} />
-                                    <PrimaryButton style={{marginTop: "5px"}} onClick={searchForUser}>Search</PrimaryButton>
-                                </div>
-                                { messageBar.show &&
-                                    <>
-                                    <div style={{marginTop: "10px"}}></div>
-                                    <MessageBar messageBarType={messageBar.type}>
-                                        {messageBar.text}
-                                    </MessageBar> 
-                                    </>
-                                }
-                                <div className={styles.peopleContainer}>
-                                {people.map((el, id) => (
-                                    <div key={id}>
-                                    <div className={styles.personaContainer}>
-                                        <Persona 
-                                            imageUrl={el.photo}
-                                            text={el.nickname}
-                                            secondaryText={el.email}
-                                            size={PersonaSize.size72}
-                                            presence={PersonaPresence.online}
-                                            imageAlt={`photo of ${el.nickname}`}
-                                        />
-                                        <div onClick={() => addPerson(el._id)} className={styles.addPersonIcon}>
-                                        {
-                                            isLoadingAddPerson === el._id ? <Spinner size={SpinnerSize.large} /> : <>
-                                            {
-                                                addedPeople.indexOf(el._id) !== -1 ? <Check checked /> :
-                                                <AiOutlineUserAdd size={"30px"}/>
-                                            }
-                                            </>
-                                        }
-                                        </div>
-                                    </div>
-                                    { people.length-1 !== id && <hr /> }
-                                    </div>
-                                ))}
-                                </div>
-                            </Modal>
                         </div>
                     }
                 </>)
             }
+            <Modal isOpen={isModalOpened} onDismiss={closeModal} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
+                <h4 className={styles.modalHeader}>Add new contacts</h4>
+                <div style={{borderBottom: "3px solid black", padding: "5px"}}>
+                    <TextField label="search for user with nickname or email" onChange={(e) => setSearchString(e.currentTarget.value)} value={searchString} />
+                    <PrimaryButton style={{marginTop: "5px"}} onClick={searchForUser}>Search</PrimaryButton>
+                    <PrimaryButton style={{marginTop: "5px", marginLeft: "5px"}} onClick={getRandomContacts}>Reset</PrimaryButton>
+                </div>
+                { messageBar.show &&
+                    <>
+                    <div style={{marginTop: "10px"}}></div>
+                    <MessageBar messageBarType={messageBar.type}>
+                        {messageBar.text}
+                    </MessageBar> 
+                    </>
+                }
+                <div className={styles.peopleContainer}>
+                {people.map((el, id) => (
+                    <div key={id}>
+                    <div className={styles.personaContainer}>
+                        <Persona 
+                            imageUrl={el.photo}
+                            text={el.nickname}
+                            secondaryText={el.email}
+                            size={PersonaSize.size72}
+                            presence={PersonaPresence.online}
+                            imageAlt={`photo of ${el.nickname}`}
+                        />
+                        <div onClick={() => addPerson(el._id)} className={styles.addPersonIcon}>
+                        {
+                            isLoadingAddPerson === el._id ? <Spinner size={SpinnerSize.large} /> : <>
+                            {
+                                addedPeople.indexOf(el._id) !== -1 ? <Check checked /> :
+                                <AiOutlineUserAdd size={"30px"}/>
+                            }
+                            </>
+                        }
+                        </div>
+                    </div>
+                    { people.length-1 !== id && <hr /> }
+                    </div>
+                ))}
+                </div>
+            </Modal>
         </div>
         </>
     )

@@ -37,21 +37,32 @@ router.get('/contacts', auth, (req, res) => {
 router.get('/contacts/people', auth, (req, res) => {
     User.find()
         .exec()
-        .then(resp => {
+        .then(async resp => {
             const usersNoSelf = resp.filter(el => {
                 const idstring = el._id.toString()
                 return idstring !== req.userData.userId
             })
 
-            const dtoArray = usersNoSelf.map(user => ({
+            const userContacts = await Contacts.findOne({userId: req.userData.userId}).exec();
+            const userContactsIds = userContacts.contacts.map(el => el._id.toString());
+            const sanitizedUsers = [];
+            usersNoSelf.forEach(el => {
+                if(userContactsIds.indexOf(el._id.toString()) === -1)
+                    sanitizedUsers.push(el)
+            })
+
+            const dtoArray = sanitizedUsers.map(user => ({
                 _id: user._id,
                 email: user.email,
                 nickname: user.nickname,
                 photo: user.photo
             }));
             
-            return res.status(200).json(dtoArray)
-        }).catch(err => res.status(500).json({ error: err }));
+            return res.json(dtoArray)
+        }).catch(err => {
+            console.log(err)
+            res.status(500).json({ error: err })
+        });
 });
 
 router.get('/contacts/add/:personId', auth, async (req, res) => {
