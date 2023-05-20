@@ -1,7 +1,8 @@
 import * as React from "react";
-import { MessageBar, MessageBarType, Modal, Separator } from "@fluentui/react"
+import { MessageBar, MessageBarType, Modal, Persona, PersonaPresence, PersonaSize, PrimaryButton, Separator, Spinner, SpinnerSize } from "@fluentui/react"
 import styles from "./landingPage.module.css";
 import moment from "moment";
+import { getToken } from "../../utils/getToken";
 
 interface IProps{
     isModalOpened: boolean;
@@ -11,10 +12,38 @@ interface IProps{
 }
 
 const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
+    const [loadingParticipants, setLoadingParticipants] = React.useState(true);
+    const [fileParticipants, setFileParticipants] = React.useState<any[]>([]);
 
     React.useEffect(() => {
-        console.log(file)
+        fetch(`http://localhost:3000/files/participants/${file._id}`, 
+            { headers: { Authorization: getToken() }
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            setLoadingParticipants(false);
+            setFileParticipants(data);
+        }).catch(err => {
+            console.log(err)
+            alert('an unexpected error ocurred while processing the request. Please reload the page and try again.')
+        })
     }, [])
+
+    const revokePermissionForUser = (userId: string) => {
+        fetch(`http://localhost:3000/files/removeAccess`, 
+            { headers: { Authorization: getToken(), 'Content-Type': 'application/json' },
+            method: "POST",
+            body: JSON.stringify({ fileId: file._id, contactId: userId })
+        })
+        .then(resp => {
+            if(resp.ok){
+                setFileParticipants(prev => prev.filter(el => el._id !== userId));
+            }
+        }).catch(err => {
+            console.log(err)
+            alert('an unexpected error ocurred while processing the request. Please reload the page and try again.')
+        })
+    }
 
     return (
         <Modal isOpen={isModalOpened} onDismiss={closeModal} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
@@ -28,12 +57,26 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
                     </MessageBar> 
                 <div style={{marginBottom: "5px"}}></div>
                 <Separator />
-                { file.participants.length === 0 ? <h3>You are not sharing this file with anyone</h3> : <h3>People who have access to this file:</h3> }
-                {file.participants.map((el: any, id: number) => (
-                    <div key={id}>
-                        <p>{el.nickname}</p>
-                    </div>
-                ))}
+                {
+                    loadingParticipants ? <Spinner size={SpinnerSize.large} /> : (
+                        <>
+                        { fileParticipants.length === 0 ? <h3>You are not sharing this file with anyone</h3> : <h3>People who have access to this file:</h3> }
+                        { fileParticipants.map((el: any, id: number) => (
+                            <div key={id} className={styles.personaContainer}>
+                                <Persona 
+                                    imageUrl={el.photo}
+                                    text={el.nickname}
+                                    secondaryText={el.email}
+                                    size={PersonaSize.size72}
+                                    presence={PersonaPresence.online}
+                                    imageAlt={`photo of ${el.nickname}`}
+                                />
+                                <PrimaryButton onClick={() => revokePermissionForUser(el._id)} text="revoke access to this file" />
+                            </div>
+                        )) }
+                        </>
+                    )
+                }
             </div>
         </Modal>
     )

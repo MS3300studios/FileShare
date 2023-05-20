@@ -89,6 +89,16 @@ router.get('/files/download/:fileId', auth, (req, res) => {
     // res.sendFile(path.resolve("uploads/1684328453309_1386b239-c3d6-45dc-acd0-dbfe8975668b.odt"))
 })
 
+router.get('/files/participants/:fileId', auth, async (req, res) => {
+    const file = await File.findById(req.params.fileId).exec();
+    if(file.userId !== req.userData.userId){
+        res.sendStatus(401);
+        return;
+    }
+
+    res.status(200).json(file.participants)
+})
+
 router.post('/files/share', auth, async (req, res) => {
     try{
         const file = await File.findById(req.body.fileId).exec();

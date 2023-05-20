@@ -54,3 +54,9 @@ article{
 .modalContainer{
     padding: 10px;
 }
+
+.personaContainer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
