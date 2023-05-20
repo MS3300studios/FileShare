@@ -9,6 +9,7 @@ import { getToken } from "../../utils/getToken";
 export default function Navigation(){
     const [loadingPhoto, setLoadingPhoto] = React.useState<boolean>(true);
     const [userPhoto, setUserPhoto] = React.useState<string>("");
+    const [dropdownOption, setDropdownOption] = React.useState<string | undefined>("Navigate")
     const userData = getUser();
 
     React.useEffect(() => {
@@ -38,6 +39,7 @@ export default function Navigation(){
         switch (item.key) {
             case "upload":
                 navigate("/file/add");
+                setDropdownOption("Navigate");
                 break;
             case "logout":
                 localStorage.clear();
@@ -46,9 +48,11 @@ export default function Navigation(){
                 break;
             case "contacts":
                 navigate("/contacts");
+                setDropdownOption("Navigate");
                 break;
             case "edit":
-                navigate("/user/edit")
+                navigate("/user/edit");
+                setDropdownOption("Navigate");
                 break;
             default:
                 break;
@@ -70,6 +74,7 @@ export default function Navigation(){
                 </Link>
                 <Dropdown
                     placeholder="Navigate"
+                    selectedKey={dropdownOption}
                     options={options}
                     className={styles.smallMenu}
                     onChange={(event, item) => onDropdownSelectChange(item)}

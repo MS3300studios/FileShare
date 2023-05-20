@@ -50,3 +50,7 @@ article{
     justify-content: center;
     margin: 0 auto;
 }
+
+.modalContainer{
+    padding: 10px;
+}

@@ -1,0 +1,12 @@
+.permissionsContainer{
+    padding: 5px;
+}
+
+.fileContainer{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.fileContainer > *{
+    margin: 20px;
+}

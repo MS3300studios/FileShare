@@ -3,6 +3,7 @@ import styles from "./contacts.module.css";
 import { getToken } from "../../utils/getToken";
 import { Check, MessageBar, MessageBarType, Modal, Persona, PersonaPresence, PersonaSize, PrimaryButton, Spinner, SpinnerSize, TextField } from "@fluentui/react";
 import { AiOutlineUserAdd } from "react-icons/ai";
+import { Permissions } from "./permissions";
 
 interface PersonDTO{
     _id: string;
@@ -23,6 +24,10 @@ export default function Contacts(){
     const [isLoadingAddPerson, setIsLoadingAddPerson] = React.useState<string>(""); //person being loaded ID
     const [messageBar, setMessageBar] = React.useState({show: false, type: MessageBarType.error, text: "an error occurred"});
     const [searchString, setSearchString] = React.useState("");
+
+    const [givingPermissionsToUser, setGivingPermissionsToUser] = React.useState("");
+    const [givingPermissionsToUserNickName, setGivingPermissionsToUserNickName] = React.useState("");
+    const [seeAlreadySharedFiles, setSeeAlreadySharedFiles] = React.useState(false);
 
     React.useEffect(() => {
         getUserContacts();
@@ -81,8 +86,12 @@ export default function Contacts(){
         // setAddedPeople([])
     }
 
-    const givePermisssions = (userId: string) => {
-        //redirect to url adding permission with user id
+    const givePermisssions = (userId: string, nickname: string, showAlreadySharedFiles?: boolean) => {
+        setGivingPermissionsToUser(userId);
+        setGivingPermissionsToUserNickName(nickname);
+        if(showAlreadySharedFiles){
+            setSeeAlreadySharedFiles(true)
+        }
     }
 
     const redirectToChat = (userId: string) => {
@@ -123,8 +132,6 @@ export default function Contacts(){
         });
     }
 
-
-
     return (
         <>
         { contacts?.length !== 0 && <div style={{width: "100%", display: "flex", justifyContent: "center", marginTop: "5px"}}>
@@ -147,7 +154,8 @@ export default function Contacts(){
                                         imageAlt={`photo of ${el.nickname}`}
                                     />
                                     <span>
-                                        <PrimaryButton onClick={() => givePermisssions(el._id)}>Give permissions to this user</PrimaryButton>
+                                        <PrimaryButton onClick={() => givePermisssions(el._id, el.nickname)}>Give access to files for this user</PrimaryButton>
+                                        <PrimaryButton onClick={() => givePermisssions(el._id, el.nickname, true)}>View files shared with user</PrimaryButton>
                                         <PrimaryButton onClick={() => redirectToChat(el._id)}>Chat</PrimaryButton>
                                         <PrimaryButton onClick={() => removeContact(el._id)}>{ isLoadingRemove === el._id ? <Spinner size={SpinnerSize.small} /> : "Remove from Contacts" }</PrimaryButton>
                                     </span>
@@ -162,6 +170,13 @@ export default function Contacts(){
                     }
                 </>)
             }
+            <Modal isOpen={givingPermissionsToUser !== ""} onDismiss={() => {setGivingPermissionsToUser(""); setGivingPermissionsToUserNickName(""); setSeeAlreadySharedFiles(false)}} titleAriaId="Give permissions" containerClassName={styles.modalClass}>
+                <Permissions 
+                    contactId={givingPermissionsToUser} 
+                    contactNickname={givingPermissionsToUserNickName} 
+                    seeAlreadySharedFiles={seeAlreadySharedFiles}
+                />
+            </Modal>
             <Modal isOpen={isModalOpened} onDismiss={closeModal} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
                 <h4 className={styles.modalHeader}>Add new contacts</h4>
                 <div style={{borderBottom: "3px solid black", padding: "5px"}}>
