@@ -35,13 +35,6 @@ router.post('/users/register', (req, res) => {
         return;
     }
 
-    // if(req.body.password.length < 8 || req.body.password.length > 20){
-    //     res.status(400).json({
-    //         error: "invalid password length"
-    //     });
-    //     return;
-    // }
-
     bcrypt.hash(req.body.password, 10, (err, hash) => {
         if(err) {
             return res.status(500).json({
@@ -146,6 +139,42 @@ router.get('/users/userphoto/:userId', auth, (req, res) => {
             console.log('get user photo error: ', error);
             res.sendStatus(500);
         })
+})
+
+router.post('/users/edit', auth, (req, res) => {
+    console.log(req.body)
+    User.findById(req.userData.userId).exec().then(async user => {
+        console.log(req.body.nickname)
+        console.log(req.body.email)
+        console.log(req.body.photo)
+
+        let nickNameTaken = false;
+        let emailTaken = false;
+
+        if(req.body.nickname !== user.nickname){
+            const matchingUsers = await User.find({ nickname: req.body.nickname }).exec();
+            if(matchingUsers.length !== 0) nickNameTaken = true;           
+        }
+
+        if(req.body.email !== user.email){
+            const matchingUsers = await User.find({ email: req.body.email }).exec();
+            console.log(matchingUsers)
+            if(matchingUsers.length !== 0) emailTaken = true;      
+        }
+
+        if(emailTaken || nickNameTaken){
+            res.sendStatus(409);
+            return;
+        }
+
+        user.nickname = req.body.nickname;
+        user.email = req.body.email;
+        if(req.body.photo !== "") user.photo = req.body.photo;
+
+        user.save().then(resp => {
+            res.sendStatus(200)
+        })
+    })
 })
 
 module.exports = router;

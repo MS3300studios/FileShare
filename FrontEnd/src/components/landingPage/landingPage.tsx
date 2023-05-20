@@ -5,6 +5,7 @@ import { IFile } from "../addFile/addFile";
 import { Modal, Spinner, SpinnerSize } from "@fluentui/react";
 import { getToken } from "../../utils/getToken";
 import FileDetails from "./fileDetails";
+import { getUser } from "../../utils/getUser";
 
 export default function LandingPage(){
     const [isLoading, setIsLoading] = React.useState(true);
@@ -16,8 +17,6 @@ export default function LandingPage(){
         fetch(`http://localhost:3000/files`, { headers: { Authorization: getToken() } }).then(resp => {
             return resp.json();
         }).then(data => {
-            console.log(data.files)
-
             setIsLoading(false);
             setFiles(data.files)
         }).catch(err => {
@@ -39,7 +38,7 @@ export default function LandingPage(){
         <main>
             <h1 style={{textAlign: "center"}}>Your files</h1>
             { isModalOpened && <FileDetails 
-                authorData="seba1" 
+                authorData={getUser().nickname} 
                 closeModal={closeModal} 
                 isModalOpened={isModalOpened} 
                 file={files.filter(el => el._id === openedFileId)[0]} 

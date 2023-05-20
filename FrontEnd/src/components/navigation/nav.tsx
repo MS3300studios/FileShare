@@ -25,7 +25,6 @@ export default function Navigation(){
     const navigate = useNavigate();
     const options: IDropdownOption[] = [
       { key: 'profileHeader', text: 'Your profile', itemType: DropdownMenuItemType.Header },
-      { key: 'view', text: 'Go to your profile' },
       { key: 'edit', text: 'Edit your profile' },
       { key: 'divider_1', text: '-', itemType: DropdownMenuItemType.Divider },
       { key: 'actionHeader', text: 'Actions', itemType: DropdownMenuItemType.Header },
@@ -47,6 +46,9 @@ export default function Navigation(){
                 break;
             case "contacts":
                 navigate("/contacts");
+                break;
+            case "edit":
+                navigate("/user/edit")
                 break;
             default:
                 break;

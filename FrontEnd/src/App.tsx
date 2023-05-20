@@ -9,6 +9,7 @@ import { Spinner, SpinnerSize, initializeIcons } from '@fluentui/react';
 initializeIcons();
 import { getToken } from './utils/getToken';
 import Contacts from "./components/contacts/contacts";
+import EditProfile from "./components/profile/editUserProfile";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -49,6 +50,7 @@ function App() {
               <Route path='/' index element={<LandingPage />} />
               <Route path='/file/add' element={<AddFile />} />
               <Route path='/contacts' element={<Contacts />} />
+              <Route path='/user/edit' element={<EditProfile />} />
             </Routes>
             </>
           ) : <Login />
