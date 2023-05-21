@@ -29,7 +29,8 @@ export default function Navigation(){
       { key: 'edit', text: 'Edit your profile' },
       { key: 'divider_1', text: '-', itemType: DropdownMenuItemType.Divider },
       { key: 'actionHeader', text: 'Actions', itemType: DropdownMenuItemType.Header },
-      { key: 'contacts', text: 'Go to your contacts' },
+      { key: 'contacts', text: 'Go to your contacts' }, 
+      { key: 'shared', text: 'Go to files shared with me' }, 
       { key: 'upload', text: 'Upload a file' },
       { key: 'logout', text: 'Log out' },
     ];
@@ -52,6 +53,10 @@ export default function Navigation(){
                 break;
             case "edit":
                 navigate("/user/edit");
+                setDropdownOption("Navigate");
+                break;
+            case "shared":
+                navigate("/shared");
                 setDropdownOption("Navigate");
                 break;
             default:

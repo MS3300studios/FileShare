@@ -70,11 +70,11 @@ router.get('/files/sharedWith/:contactId', auth, (req, res) => {
 //get all files that are shared with the user (where he is a participant for a file)
 router.get('/files/shared', auth, (req, res) => {
     File.find().exec().then(allFiles => {
-        const userFiles = allFiles.map(file => {
+        const userFiles = allFiles.filter(file => {
             const participantsIds = file.participants.map(participant => participant._id.toString());
             if(participantsIds.indexOf(req.userData.userId) !== -1){
-                return file
-            }
+                return true;
+            } else return false;
         })
 
         res.status(200).json({ files: userFiles })
