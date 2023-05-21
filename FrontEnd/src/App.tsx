@@ -11,6 +11,7 @@ import { getToken } from './utils/getToken';
 import Contacts from "./components/contacts/contacts";
 import EditProfile from "./components/profile/editUserProfile";
 import Shared from "./components/shared/shared";
+import Chat from "./components/chat/chat";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -53,6 +54,7 @@ function App() {
               <Route path='/contacts' element={<Contacts />} />
               <Route path='/shared' element={<Shared />} />
               <Route path='/user/edit' element={<EditProfile />} />
+              <Route path='/chat/:contactId' element={<Chat />} />
             </Routes>
             </>
           ) : <Login />

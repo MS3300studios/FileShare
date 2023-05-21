@@ -4,6 +4,7 @@ import { getToken } from "../../utils/getToken";
 import { Check, MessageBar, MessageBarType, Modal, Persona, PersonaPresence, PersonaSize, PrimaryButton, Spinner, SpinnerSize, TextField } from "@fluentui/react";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { Permissions } from "./permissions";
+import { useNavigate } from "react-router-dom";
 
 interface PersonDTO{
     _id: string;
@@ -13,6 +14,7 @@ interface PersonDTO{
 }
 
 export default function Contacts(){
+    const navigate = useNavigate();
     const [contacts, setContacts] = React.useState<PersonDTO[]>();
     const [isLoading, setIsLoading] = React.useState(true);
     const [isModalOpened, setIsModalOpened] = React.useState(false);
@@ -95,7 +97,7 @@ export default function Contacts(){
     }
 
     const redirectToChat = (userId: string) => {
-        //redirect to chat with user id
+        navigate(`/chat/${userId}`)
     }
 
     const removeContact = (personId: string) => {

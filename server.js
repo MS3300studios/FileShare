@@ -17,6 +17,7 @@ const serverCorsOptions = {
 app.use(require('./controllers/users'));
 app.use(require('./controllers/contacts'));
 app.use(require('./controllers/files'));
+app.use(require('./controllers/conversation'));
 app.use(cors(serverCorsOptions));
 
 const server = app.listen(PORT, () => {
@@ -24,7 +25,6 @@ const server = app.listen(PORT, () => {
 })
 
 const io = socket(server, socketCorsOptions);
-
 
 app.get('/', (req, res) => {
     res.send('ok')
