@@ -45,6 +45,28 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
         })
     }
 
+    const handleFileDownload = () => {
+        fetch(`http://localhost:3000/files/download/${file._id}`, 
+            { headers: { Authorization: getToken() }
+        })
+        .then(response => {
+            if (response.ok) {
+                response.blob().then(blob => {
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = file.name;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                });
+            }
+        }).catch(err => {
+            console.log(err)
+            alert('an unexpected error ocurred while processing the request. Please reload the page and try again.')
+        })
+    }
+
     return (
         <Modal isOpen={isModalOpened} onDismiss={closeModal} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
             <div className={styles.modalContainer}>
@@ -56,6 +78,7 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
                         in order to share this file with your contacts, go to contacts and select the person with whom you want to share this file
                     </MessageBar> 
                 <div style={{marginBottom: "5px"}}></div>
+                <PrimaryButton text="Download file" onClick={handleFileDownload} />
                 <Separator />
                 {
                     loadingParticipants ? <Spinner size={SpinnerSize.large} /> : (

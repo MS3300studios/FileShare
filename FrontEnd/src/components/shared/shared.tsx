@@ -36,16 +36,28 @@ const Shared = () => {
 
     const handleDownload = () => {
         if(fileToDownloadId === "") return;
-        console.log("downloading file")
-        // fetch(`http://localhost:3000/files/shared/`, { headers: { Authorization: getToken() } })
-        // .then(resp => {
-        //     return resp.json();
-        // }).then(data => {
-        //     setIsLoading(false);
-        //     setFiles(data.files);
-        // }).catch(err => {
-        //     console.log(err)
-        // });
+
+        fetch(`http://localhost:3000/files/download/${fileToDownloadId}`, 
+            { headers: { Authorization: getToken() }
+        })
+        .then(response => {
+            if (response.ok) {
+                const targetFile = files.filter(f => f._id === fileToDownloadId)[0] //always unique
+                
+                response.blob().then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = targetFile.name;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                });
+            }
+        }).catch(err => {
+            console.log(err)
+            alert('an unexpected error ocurred while processing the request. Please reload the page and try again.')
+        })
     }
 
     return (

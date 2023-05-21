@@ -5,6 +5,7 @@ const auth = require('../middleware/authorization');
 const upload = require('../middleware/upload');
 const path = require('path');
 const File = require('../models/File');
+const { restart } = require('nodemon');
 const User = require('../models/User').User;
 
 router.use(cors());
@@ -84,9 +85,14 @@ router.get('/files/shared', auth, (req, res) => {
     })
 })
 
-router.get('/files/download/:fileId', auth, (req, res) => {
-    //check if user is an author of the file, or a participant
-    // res.sendFile(path.resolve("uploads/1684328453309_1386b239-c3d6-45dc-acd0-dbfe8975668b.odt"))
+router.get('/files/download/:fileId', auth, async (req, res) => {
+    const file = await File.findById(req.params.fileId).exec();
+    const fileParticipants = file.participants.map(par => par._id.toString())
+
+    if(file.userId === req.userData.userId || fileParticipants.indexOf(req.userData.userId) !== -1)
+        res.sendFile(path.resolve(file.path));
+    else 
+        res.sendStatus(401)
 })
 
 router.get('/files/participants/:fileId', auth, async (req, res) => {
