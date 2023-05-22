@@ -12,6 +12,7 @@ import Contacts from "./components/contacts/contacts";
 import EditProfile from "./components/profile/editUserProfile";
 import Shared from "./components/shared/shared";
 import Chat from "./components/chat/chat";
+import Conversations from "./components/conversations/conversations";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -53,6 +54,7 @@ function App() {
               <Route path='/file/add' element={<AddFile />} />
               <Route path='/contacts' element={<Contacts />} />
               <Route path='/shared' element={<Shared />} />
+              <Route path='/conversations' element={<Conversations />} />
               <Route path='/user/edit' element={<EditProfile />} />
               <Route path='/chat/:contactId' element={<Chat />} />
             </Routes>

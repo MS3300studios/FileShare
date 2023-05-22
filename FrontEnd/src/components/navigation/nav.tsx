@@ -30,6 +30,7 @@ export default function Navigation(){
       { key: 'divider_1', text: '-', itemType: DropdownMenuItemType.Divider },
       { key: 'actionHeader', text: 'Actions', itemType: DropdownMenuItemType.Header },
       { key: 'contacts', text: 'Go to your contacts' }, 
+      { key: 'conversations', text: 'Go to your conversations' }, 
       { key: 'shared', text: 'Go to files shared with me' }, 
       { key: 'upload', text: 'Upload a file' },
       { key: 'logout', text: 'Log out' },
@@ -57,6 +58,10 @@ export default function Navigation(){
                 break;
             case "shared":
                 navigate("/shared");
+                setDropdownOption("Navigate");
+                break;
+            case "conversations":
+                navigate("/conversations");
                 setDropdownOption("Navigate");
                 break;
             default:

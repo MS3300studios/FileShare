@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 import styles from './chat.module.css';
 import { useLocation } from 'react-router-dom';
 import { getToken } from '../../utils/getToken';
+import { getUser } from '../../utils/getUser';
 
 const ChatComponent: React.FC = () => {
     const [loadingMessages, setLoadingMessages] = useState(true);
@@ -13,6 +14,7 @@ const ChatComponent: React.FC = () => {
     
     const location = useLocation();
     const contactId = location.pathname.slice(location.pathname.lastIndexOf('/')+1, location.pathname.length)
+    const userData = getUser();
     
     React.useEffect(() => {
         fetch(`http://localhost:3000/conversation/${contactId}`, 
@@ -36,7 +38,7 @@ const ChatComponent: React.FC = () => {
         const message = {
             id: uuid(),
             content: newMessage.trim(),
-            author: 'User',
+            author: userData.nickname,
         };
 
         setMessages(prevMessages => [...prevMessages, message]);
@@ -47,7 +49,7 @@ const ChatComponent: React.FC = () => {
         return (
         <div className={styles.message}>
             <b>{item.author}: </b>
-            {item.content}
+            <p>{item.content}</p>
         </div>
         );
     };
