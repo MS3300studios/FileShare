@@ -13,6 +13,9 @@ import EditProfile from "./components/profile/editUserProfile";
 import Shared from "./components/shared/shared";
 import Chat from "./components/chat/chat";
 import Conversations from "./components/conversations/conversations";
+import io from 'socket.io-client';
+
+const socket = io("http://localhost:3000");
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -56,7 +59,7 @@ function App() {
               <Route path='/shared' element={<Shared />} />
               <Route path='/conversations' element={<Conversations />} />
               <Route path='/user/edit' element={<EditProfile />} />
-              <Route path='/chat/:contactId' element={<Chat />} />
+              <Route path='/chat/:contactId' element={<Chat socket={socket} />} />
             </Routes>
             </>
           ) : <Login />

@@ -35,12 +35,16 @@ app.get('/auth', auth, (req, res) => {
 })
 
 io.on("connection", socket => {
-    socket.emit('welcome', socket.id)
-    socket.join('room1');
-    socket.on('message', message => {
-        io.to("room1").emit('receiveMessage', {
+    socket.on('message', message => {  //message: { conversationId: currentConversation._id, text: newMessage, authorNickname: userData.nickname }
+        console.log(message)
+        io.to(message.conversationId).emit('receiveMessage', {
             userId: socket.id,
             message: message
         })
+    })
+
+    socket.on('join', ({conversationId}) => {
+        console.log(`a user joined room nr: ${conversationId}`)
+        socket.join(conversationId); //user is joining a specific rom
     })
 })

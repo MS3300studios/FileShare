@@ -29,4 +29,26 @@
 .noMessages {
     padding: 10px;
 }
-  
+
+.messagesContainer{
+    overflow-y: auto;
+    width: 100%;
+    min-height: 80%;
+}
+
+.messageWrapper{
+    display: flex;
+    width: 100%;
+}
+
+.message{
+    width: 300px;
+    margin: 10px;
+    word-wrap: break-word;
+    border-radius: 5px;
+}
+
+.messageInfoContainer{
+    display: flex;
+    justify-content: space-between;
+}

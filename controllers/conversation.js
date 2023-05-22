@@ -60,8 +60,8 @@ router.get('/conversation/:secondId', auth, (req, res) => {
             const user2 = await User.findById(req.params.secondId);
 
             const newConv = new Conversation({ participants: [user1, user2], messages: [] });
-            newConv.save().then(() => {
-                res.sendStatus(201)
+            newConv.save().then((savedConv) => {
+                res.status(201).json(savedConv);
             }).catch(err => console.log(err))
         } else {
             res.status(200).json(selectedConversation);
