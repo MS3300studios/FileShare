@@ -76,7 +76,7 @@ export default function AddFile(){
 
         const formData = new FormData();
         formData.append("file", fileData);
-        formData.append("type", file.type);
+        formData.append("type", selectedType);
         formData.append("name", file.name);
 
         fetch(`http://localhost:3000/files/add`, { 
@@ -84,7 +84,6 @@ export default function AddFile(){
             headers: { Authorization: getToken() },
             body: formData
         }).then(resp => {
-            console.log(resp)
             setIsSendingFile(false)
             setMessageBar({show: true, type: MessageBarType.success, text: "file upload successful, redirecting..."})
             setTimeout(() => {

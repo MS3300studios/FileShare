@@ -14,7 +14,7 @@ router.post('/files/add', auth, upload.single('file'), (req, res) => {
     if(!req.file){
         res.sendStatus(400)
     }
-
+    
     const file = new File({
         userId: req.userData.userId,
         participants: [],

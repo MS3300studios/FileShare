@@ -32,7 +32,7 @@ const resolveSrc = (docType: string) => {
 
         case "document":
             return documentImage;
-    
+
         default:
             return unknownImage;
     }
@@ -47,20 +47,8 @@ interface IUser{
 export default function Card({ id, userId, name, size, uploadedAt, ext, docType, modalHandler }: ICardProps){
     const [isLoadingUser, setIsLoadingUser] = React.useState(true);
     const [user, setUser] = React.useState<IUser>({nickname: "loading", photo: "loading photo", email: "loading"});
-
-    React.useEffect(() => {
-        fetch(`http://localhost:3000/users/getUser/${userId}`,
-            { headers: { Authorization: getToken() } 
-        }).then(resp => resp.json()).then(data => {
-            setIsLoadingUser(false);
-            setUser(data);
-        });
-    }, [])
-
-    if(isLoadingUser)
-        return <Spinner size={SpinnerSize.medium} />
-
-    const previewProps: IDocumentCardPreviewProps = {
+    const [DocumentCardActivityPeople, setDocumentCardActivityPeople] = React.useState([{ name: user.nickname, profileImageSrc: user.photo }])
+    const [previewProps, setPreviewProps] = React.useState<IDocumentCardPreviewProps>({
         previewImages: [
             {
                 name: name,
@@ -73,20 +61,51 @@ export default function Card({ id, userId, name, size, uploadedAt, ext, docType,
                 height: 200,
             },
         ],
-    };
-    const DocumentCardActivityPeople = [{ name: user.nickname, profileImageSrc: user.photo }];
+    });
+
+    React.useEffect(() => {
+        fetch(`http://localhost:3000/users/getUser/${userId}`,
+            { headers: { Authorization: getToken() } 
+        }).then(resp => resp.json()).then(data => {
+            setIsLoadingUser(false);
+            setUser(data);
+            setPreviewProps({
+                previewImages: [
+                    {
+                        name: name,
+                        linkProps: {
+                            href: '/hello',
+                            target: '_blank',
+                        },
+                        previewImageSrc: resolveSrc(docType),
+                        width: 200,
+                        height: 200,
+                    },
+                ],
+            })
+    
+            setDocumentCardActivityPeople([{ name: data.nickname, profileImageSrc: data.photo }])
+        });
+
+    }, [])
 
     return (
-        <DocumentCard
-            aria-label="Default Document Card with large file name. Created by Annie Lindqvist a few minutes ago."
-            onClick={() => modalHandler(id)}
-        >
-            <DocumentCardPreview {...previewProps} />
-            <DocumentCardTitle
-                title={`${name} - ${size} kb`}
-                shouldTruncate
-            />
-            <DocumentCardActivity activity={`${moment(uploadedAt).format('MMMM Do YYYY, h:mm a')}`} people={DocumentCardActivityPeople} />
-        </DocumentCard>
+        <>
+        {
+            isLoadingUser ? <Spinner size={SpinnerSize.medium} /> : (
+                <DocumentCard
+                    aria-label="Default Document Card with large file name. Created by Annie Lindqvist a few minutes ago."
+                    onClick={() => modalHandler(id)}
+                >
+                    <DocumentCardPreview {...previewProps} />
+                    <DocumentCardTitle
+                        title={`${name}`}
+                        shouldTruncate
+                    />
+                    <DocumentCardActivity activity={`${moment(uploadedAt).format('MMMM Do YYYY, h:mm a')}`} people={DocumentCardActivityPeople} />
+                </DocumentCard>
+            )
+        }
+        </>
     )
 }
