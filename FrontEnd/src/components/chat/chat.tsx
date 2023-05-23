@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { List, TextField, PrimaryButton, MessageBarType, MessageBar, Spinner, SpinnerSize } from '@fluentui/react';
+import { TextField, PrimaryButton, MessageBarType, MessageBar, Spinner, SpinnerSize } from '@fluentui/react';
 import styles from './chat.module.css';
 import { v4 as uuid } from "uuid";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getToken } from '../../utils/getToken';
 import { getUser } from '../../utils/getUser';
+import moment from 'moment';
 
 interface ISocketMessage{
     userId: string; //socket uuid
     message: {
         conversationId: string, 
         text: string, 
-        authorNickname: string
+        authorNickname: string,
+        createdAt?: string
     }
 }
 
@@ -23,13 +25,18 @@ const ChatComponent = ({socket}: any) => {
     const [currentConversation, setCurrentConversation] = useState<any>(null);
 
     const location = useLocation();
+    const navigate = useNavigate();
     const contactId = location.pathname.slice(location.pathname.lastIndexOf('/')+1, location.pathname.length)
     const userData = getUser();
+    const messagesEndRef = React.useRef(null)
     
     React.useEffect(() => {
         socket.on("receiveMessage", (message: ISocketMessage) => {
-            console.log('messsage')
+            console.log(message)
             setMessages(prevMessages => [...prevMessages, message.message]);
+            setTimeout(() => {
+                (messagesEndRef.current as any).scrollIntoView({ behavior: "smooth" })
+            }, 200);
         })
 
         fetch(`http://localhost:3000/conversation/${contactId}`, 
@@ -63,13 +70,23 @@ const ChatComponent = ({socket}: any) => {
         const message = {
             conversationId: currentConversation._id,
             text: newMessage,
-            authorNickname: userData.nickname,
-            messageId: uuid
+            authorNickname: userData.nickname
         };
 
         socket.emit("message", message)
         setNewMessage('');
     };
+
+    const selfUser = getUser();
+    let otherUser: any;
+    if(!loadingMessages){
+        otherUser = currentConversation.participants.filter((el: any) => el.nickname !== selfUser.nickname)[0]
+    }
+
+    const handleKeyboardEvent = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if(e.code === "Enter")
+            handleSendMessage();
+    }
 
     return (
         <div className={styles.container}>
@@ -85,31 +102,42 @@ const ChatComponent = ({socket}: any) => {
                         </>
                     }
                     <div className={styles.messagesContainer}>
+                        <div className={styles.chatHeaderContainer}>
+                            <img src={otherUser.photo} alt={`${otherUser.nickname}'s photo`} />
+                            <h1>{otherUser.nickname}</h1>
+                        </div>
                         {
                             messages.map((msg, id) => {
                                 const isSelf = msg.authorNickname === userData.nickname;
+                                const messageDate = moment(msg.createdAt).format("MMMM Do YYYY, h:mm a")
                                 return (
                                     <div key={id} className={styles.messageWrapper} style={isSelf ? { justifyContent: "flex-end" } : { justifyContent: "flex-start"} } >
                                         <div className={styles.message} style={isSelf ? { backgroundColor: "lightblue" } : { backgroundColor: "lightcoral" }}>
                                             <div className={styles.messageInfoContainer}>
                                                 <h3>{msg.authorNickname}</h3>
-                                                <h3>12th Jan 9:03 am</h3>
+                                                <h3>{messageDate}</h3>
                                             </div>
                                             <p>{msg.text}</p>
                                         </div>
+                                        { messages.length-1 === id ? <div ref={messagesEndRef}></div> : null }
                                     </div>
                                 )
                             })
-                        }
+}
                     </div>
                     <div className={styles.inputContainer}>
                         <TextField
                             value={newMessage}
                             onChange={(_, newValue) => setNewMessage(newValue || '')}
                             placeholder="Type a message..."
+                            onKeyDown={handleKeyboardEvent}
                             className={styles.inputField}
                         />
                         <PrimaryButton text="Send" onClick={handleSendMessage} />
+                        <div style={{marginLeft: "5px"}}></div>
+                        <PrimaryButton text="Scroll to bottom" onClick={() => {
+                            (messagesEndRef.current as any).scrollIntoView({ behavior: "smooth" })
+                        }} />
                     </div>
                     {messages.length === 0 && <div className={styles.noMessages}>No messages have been sent yet</div>}
                     </>

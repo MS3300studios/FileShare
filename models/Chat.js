@@ -3,7 +3,7 @@ const UserSchema = require("./User").userSchema;
 
 const messageSchema = new db.Schema({
     text: { type: String },
-    authorId: { type: String },
+    authorNickname: { type: String },
 }, {
     timestamps: true
 });
@@ -15,4 +15,4 @@ const schema = new db.Schema({
 
 const Conversation = db.model("Conversation", schema);
 
-module.exports = Conversation;
+module.exports = {Conversation: Conversation, messageSchema: messageSchema};

@@ -9,7 +9,7 @@ const serverCorsOptions = {
 }
 
 router.use(cors(serverCorsOptions));
-const Conversation = require("../models/Chat");
+const Conversation = require("../models/Chat").Conversation;
 const User = require('../models/User').User;
 
 router.get('/conversations', auth, (req, res) => {

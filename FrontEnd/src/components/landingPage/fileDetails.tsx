@@ -1,12 +1,12 @@
 import * as React from "react";
-import { MessageBar, MessageBarType, Modal, Persona, PersonaPresence, PersonaSize, PrimaryButton, Separator, Spinner, SpinnerSize } from "@fluentui/react"
+import { DefaultButton, MessageBar, MessageBarType, Modal, Persona, PersonaPresence, PersonaSize, PrimaryButton, Separator, Spinner, SpinnerSize } from "@fluentui/react"
 import styles from "./landingPage.module.css";
 import moment from "moment";
 import { getToken } from "../../utils/getToken";
 
 interface IProps{
     isModalOpened: boolean;
-    closeModal: () => void;
+    closeModal: (reload: boolean) => void;
     authorData: string;
     file: any;
 }
@@ -14,6 +14,7 @@ interface IProps{
 const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
     const [loadingParticipants, setLoadingParticipants] = React.useState(true);
     const [fileParticipants, setFileParticipants] = React.useState<any[]>([]);
+    const [loadingDelete, setLoadingDelete] = React.useState(false);
 
     React.useEffect(() => {
         fetch(`http://localhost:3000/files/participants/${file._id}`, 
@@ -67,8 +68,23 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
         })
     }
 
+    const handleFileDeletion = () => {
+        setLoadingDelete(true);
+        fetch(`http://localhost:3000/files/delete/${file._id}`, 
+            { headers: { Authorization: getToken() }
+        })
+        .then(response => {
+            if (response.ok) {
+                closeModal(true);
+            }
+        }).catch(err => {
+            console.log(err)
+            alert('an unexpected error ocurred while processing the request. Please reload the page and try again.')
+        })
+    }
+
     return (
-        <Modal isOpen={isModalOpened} onDismiss={closeModal} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
+        <Modal isOpen={isModalOpened} onDismiss={() => closeModal(false)} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
             <div className={styles.modalContainer}>
                 <h3>{file.name}</h3>
                 <p>This file was uploaded by: {authorData}</p>
@@ -77,8 +93,11 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
                     <MessageBar messageBarType={MessageBarType.info}>
                         in order to share this file with your contacts, go to contacts and select the person with whom you want to share this file
                     </MessageBar> 
-                <div style={{marginBottom: "5px"}}></div>
-                <PrimaryButton text="Download file" onClick={handleFileDownload} />
+                <div style={{marginTop: "5px", display: "flex", alignItems: "center"}}>
+                    <PrimaryButton text="Download file" onClick={handleFileDownload} />
+                    <DefaultButton text="Delete file" onClick={handleFileDeletion} className={styles.deleteButton} />
+                    { loadingDelete && <Spinner size={SpinnerSize.small} />}
+                </div>
                 <Separator />
                 {
                     loadingParticipants ? <Spinner size={SpinnerSize.large} /> : (

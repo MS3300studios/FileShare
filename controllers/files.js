@@ -5,8 +5,8 @@ const auth = require('../middleware/authorization');
 const upload = require('../middleware/upload');
 const path = require('path');
 const File = require('../models/File');
-const { restart } = require('nodemon');
 const User = require('../models/User').User;
+const fs = require('fs');
 
 router.use(cors());
 
@@ -93,6 +93,30 @@ router.get('/files/download/:fileId', auth, async (req, res) => {
         res.sendFile(path.resolve(file.path));
     else 
         res.sendStatus(401)
+})
+
+router.get('/files/delete/:fileId', auth, async (req, res) => {
+    const file = await File.findById(req.params.fileId).exec();
+    if(file.userId !== req.userData.userId){
+        res.sendStatus(401);
+        return;
+    }
+
+    file.deleteOne().then(resp => {        
+        console.log(resp.path)
+
+        fs.unlink(resp.path, (err) => {
+            if (err) {
+                console.error('Error deleting file:', err);
+            } else {
+                console.log(`File ${resp.name} deleted successfully.`);
+                res.sendStatus(200);
+            }
+        });
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json({error: err})
+    });
 })
 
 router.get('/files/participants/:fileId', auth, async (req, res) => {

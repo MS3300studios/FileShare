@@ -2,6 +2,7 @@ const express = require("express");
 const socket = require("socket.io");
 const auth = require("./middleware/authorization");
 const cors = require("cors");
+const { messageSchema, Conversation } = require("./models/Chat");
 require('dotenv').config()
 
 const PORT = 3000;
@@ -36,11 +37,18 @@ app.get('/auth', auth, (req, res) => {
 
 io.on("connection", socket => {
     socket.on('message', message => {  //message: { conversationId: currentConversation._id, text: newMessage, authorNickname: userData.nickname }
-        console.log(message)
-        io.to(message.conversationId).emit('receiveMessage', {
-            userId: socket.id,
-            message: message
+        //save message based on schema
+        Conversation.findById(message.conversationId).exec().then(conv => {
+            const newMessage = { authorNickname: message.authorNickname, text: message.text }
+            conv.messages = [...conv.messages, newMessage]
+            conv.save().then(resp => {
+                io.to(message.conversationId).emit('receiveMessage', {
+                    userId: socket.id,
+                    message: {...message, createdAt: Date.now() },
+                })
+            })
         })
+
     })
 
     socket.on('join', ({conversationId}) => {

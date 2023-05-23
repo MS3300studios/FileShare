@@ -29,9 +29,19 @@ export default function LandingPage(){
         setOpenedFileId(id)
     }
 
-    const closeModal = () => {
+    const closeModal = (reload: boolean) => {
         setIsModalOpened(false);
         setOpenedFileId("");
+        if(reload){
+            fetch(`http://localhost:3000/files`, { headers: { Authorization: getToken() } }).then(resp => {
+                return resp.json();
+            }).then(data => {
+                setIsLoading(false);
+                setFiles(data.files)
+            }).catch(err => {
+                console.log(err)
+            });
+        }
     }
 
     return(

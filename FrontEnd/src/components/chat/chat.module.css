@@ -16,7 +16,7 @@
     justify-content: center;
     margin-top: 10px;
     position: absolute;
-    bottom: 10px;
+    bottom: -40px;
     left: 0px;
     width: 100%;
 }
@@ -51,4 +51,27 @@
 .messageInfoContainer{
     display: flex;
     justify-content: space-between;
+}
+
+.chatHeaderContainer{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: lightskyblue;
+    padding: 10px 0px;
+    padding-left: 20px;
+    position: sticky;
+    top: 0px;
+}
+
+.chatHeaderContainer > h1{
+    margin: 0px;
+    margin-left: 20px;
+}
+
+.chatHeaderContainer > img{
+    transition: 0.3s ease-out;
+    border-radius: 50px;
+    width: 40px;
+    height: 40px;
 }

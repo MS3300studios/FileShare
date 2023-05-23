@@ -60,3 +60,9 @@ article{
     justify-content: space-between;
     align-items: center;
 }
+
+.deleteButton{
+    background-color: salmon;
+    margin-left: 5px;
+    margin-right: 10px;
+}
