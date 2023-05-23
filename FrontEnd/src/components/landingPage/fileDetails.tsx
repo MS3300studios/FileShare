@@ -1,8 +1,11 @@
 import * as React from "react";
-import { DefaultButton, MessageBar, MessageBarType, Modal, Persona, PersonaPresence, PersonaSize, PrimaryButton, Separator, Spinner, SpinnerSize } from "@fluentui/react"
+import { DefaultButton, MessageBar, MessageBarType, Modal, Persona, PersonaPresence, PersonaSize, PrimaryButton, Separator, Spinner, SpinnerSize, TextField } from "@fluentui/react"
 import styles from "./landingPage.module.css";
 import moment from "moment";
 import { getToken } from "../../utils/getToken";
+import { BiEditAlt } from "react-icons/bi";
+import { AiOutlineCheck } from "react-icons/ai";
+import { FcCancel } from "react-icons/fc";
 
 interface IProps{
     isModalOpened: boolean;
@@ -15,6 +18,10 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
     const [loadingParticipants, setLoadingParticipants] = React.useState(true);
     const [fileParticipants, setFileParticipants] = React.useState<any[]>([]);
     const [loadingDelete, setLoadingDelete] = React.useState(false);
+    const [isEditing, setIsEditing] = React.useState(false);
+    const [currentFileName, setCurrentFileName] = React.useState(file.name);
+    const [newFileName, setNewFileName] = React.useState(file.name);
+    const [nameWasEdited, setNameWasEdited] = React.useState(false);
 
     React.useEffect(() => {
         fetch(`http://localhost:3000/files/participants/${file._id}`, 
@@ -83,10 +90,57 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
         })
     }
 
+    const handleFileEdit = () => {
+        if(newFileName === file.name){
+            setIsEditing(false);
+            return;
+        }
+
+        fetch(`http://localhost:3000/files/edit`, 
+            { 
+                method: "POST", 
+                body: JSON.stringify({name: newFileName, fileId: file._id}), 
+                headers: { Authorization: getToken(), 'Content-Type': 'application/json' } 
+            }
+        ).then(response => {
+            if (response.ok) {
+                setIsEditing(false);
+                setCurrentFileName(newFileName);
+                setNameWasEdited(true);
+            }
+        }).catch(err => {
+            console.log(err)
+            alert('an unexpected error ocurred while processing the request. Please reload the page and try again.')
+        })
+    }
+
     return (
-        <Modal isOpen={isModalOpened} onDismiss={() => closeModal(false)} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
+        <Modal isOpen={isModalOpened} onDismiss={() => closeModal(nameWasEdited)} titleAriaId="Add contacts" containerClassName={styles.modalClass}>
             <div className={styles.modalContainer}>
-                <h3>{file.name}</h3>
+                <div className={styles.headerContainer}>
+                    {
+                        isEditing ? (
+                            <>
+                            <TextField value={newFileName} onChange={(e) => setNewFileName(e.currentTarget.value)} className={styles.textField} />
+                            <div style={{ display: "flex", width: "70px", alignItems: "center" }}>
+                                <div onClick={handleFileEdit} className={styles.editIconContainer} style={{marginRight: "5px"}}>
+                                    <AiOutlineCheck size={"2em"} />
+                                </div>
+                                <div onClick={() => setIsEditing(false)} className={styles.editIconContainer}>
+                                    <FcCancel size={"2em"} />
+                                </div>
+                            </div>
+                            </>
+                        ) : (
+                            <>
+                            <h3>{currentFileName}</h3>
+                            <div onClick={() => setIsEditing(true)} className={styles.editIconContainer}>
+                                <BiEditAlt size={"2em"} />
+                            </div>
+                            </>
+                        )
+                    }
+                </div>
                 <p>This file was uploaded by: {authorData}</p>
                 <p>This file was uploaded on {moment(file.createdAt).format('Do MMMM YYYY, h:mm a')}</p>
                 <div style={{marginTop: "5px"}}></div>

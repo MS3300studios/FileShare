@@ -119,6 +119,23 @@ router.get('/files/delete/:fileId', auth, async (req, res) => {
     });
 })
 
+router.post('/files/edit', auth, async (req, res) => {
+    const file = await File.findById(req.body.fileId).exec();
+
+    if(file.userId !== req.userData.userId){
+        res.sendStatus(401);
+        return;
+    }
+
+    file.name = req.body.name;
+    file.save().then(resp => {
+        res.sendStatus(200)
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json({ error: err })
+    })
+})
+
 router.get('/files/participants/:fileId', auth, async (req, res) => {
     const file = await File.findById(req.params.fileId).exec();
     if(file.userId !== req.userData.userId){

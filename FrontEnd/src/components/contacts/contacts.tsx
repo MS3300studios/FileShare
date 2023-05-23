@@ -145,24 +145,28 @@ export default function Contacts(){
                     { (contacts && contacts.length > 0) ? <>
                         {
                             <div style={{width: "80%"}}>
-                            {contacts.map((el, id) => (
-                                <div className={styles.singleContact} key={id}>
-                                    <Persona 
-                                        imageUrl={el.photo}
-                                        text={el.nickname}
-                                        secondaryText={el.email}
-                                        size={PersonaSize.size72}
-                                        presence={PersonaPresence.online}
-                                        imageAlt={`photo of ${el.nickname}`}
-                                    />
-                                    <span>
-                                        <PrimaryButton onClick={() => givePermisssions(el._id, el.nickname)}>Give access to files for this user</PrimaryButton>
-                                        <PrimaryButton onClick={() => givePermisssions(el._id, el.nickname, true)}>View files shared with user</PrimaryButton>
-                                        <PrimaryButton onClick={() => redirectToChat(el._id)}>Chat</PrimaryButton>
-                                        <PrimaryButton onClick={() => removeContact(el._id)}>{ isLoadingRemove === el._id ? <Spinner size={SpinnerSize.small} /> : "Remove from Contacts" }</PrimaryButton>
-                                    </span>
-                                </div>
-                            ))}
+                            {
+                                contacts.map((el, id) => { 
+                                    return (
+                                        <div className={styles.singleContact} key={id}>
+                                            <Persona 
+                                                imageUrl={el.photo}
+                                                text={el.nickname}
+                                                secondaryText={el.email}
+                                                size={PersonaSize.size72}
+                                                presence={PersonaPresence.online}
+                                                imageAlt={`photo of ${el.nickname}`}
+                                            />
+                                            <span>
+                                                <PrimaryButton onClick={() => givePermisssions(el._id, el.nickname)}>Give access to files for this user</PrimaryButton>
+                                                <PrimaryButton onClick={() => givePermisssions(el._id, el.nickname, true)}>View files shared with user</PrimaryButton>
+                                                <PrimaryButton onClick={() => redirectToChat(el._id)}>Chat</PrimaryButton>
+                                                <PrimaryButton onClick={() => removeContact(el._id)}>{ isLoadingRemove === el._id ? <Spinner size={SpinnerSize.small} /> : "Remove from Contacts" }</PrimaryButton>
+                                            </span>
+                                        </div>
+                                    )
+                                })
+                            }
                             </div>
                         }
                     </> : 
