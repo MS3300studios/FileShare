@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Callout, PrimaryButton, Spinner, SpinnerSize } from "@fluentui/react";
+import { Callout, PrimaryButton, Spinner, SpinnerSize, TextField } from "@fluentui/react";
 import { getToken } from "../../utils/getToken";
 import styles from "./shared.module.css";
 import Card from "../landingPage/card";
@@ -9,6 +9,7 @@ const Shared = () => {
     const [isCalloutVisible, setIsCalloutVisible] = React.useState(false);
     const [files, setFiles] = React.useState<any[]>([]);
     const [fileToDownloadId, setFileToDownloadId] = React.useState<string>("");
+    const [filterText, setFilterText] = React.useState("");
     const targetRef = React.useRef<HTMLDivElement | null>(null);
 
     React.useEffect(() => {
@@ -60,6 +61,10 @@ const Shared = () => {
         })
     }
 
+    const handleFileSearch = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFilterText(e.currentTarget.value)
+    }
+
     return (
         <div className={styles.mainContainer}>
             {
@@ -72,10 +77,14 @@ const Shared = () => {
                                 <p>To change that go to your contacts, add people to the list and ask them for access</p>
                                 </div>
                             ) : (
-                                <div>
+                                <div style={{width: "80%", margin: "0 auto"}}>
                                     <h1>Files shared with me</h1>
-                                    { files.map((item, id) => (
-                                        <div key={id} ref={targetRef}>
+                                    <div style={{ width: "40%", margin: "0 auto", marginBottom: "10px" }} ref={targetRef}>
+                                        <TextField placeholder="search for file name" onChange={handleFileSearch} value={filterText} />
+                                    </div>
+                                    <div style={{width: "100%", display: "flex", flexWrap: "wrap"}}>
+                                    { files.filter(file => file.name.toLowerCase().includes(filterText.toLowerCase())).map((item, id) => (
+                                        <div key={id} style={{margin: "5px"}}>
                                             <Card 
                                                 id={item._id}
                                                 userId={item.userId}
@@ -86,16 +95,17 @@ const Shared = () => {
                                                 uploadedAt={item.createdAt}
                                                 modalHandler={modalHandler}
                                             />
+                                            {isCalloutVisible && (
+                                                <Callout target={targetRef.current} onDismiss={toggleCallout}>
+                                                    <div className={styles.calloutInternalContainer}>
+                                                        <p>Do you want to download this file?</p>
+                                                        <PrimaryButton text="Download" onClick={handleDownload} />
+                                                    </div>
+                                                </Callout>
+                                            )}
                                         </div>
                                     )) }
-                                    {isCalloutVisible && (
-                                        <Callout target={targetRef.current} onDismiss={toggleCallout}>
-                                            <div className={styles.calloutInternalContainer}>
-                                                <p>Do you want to download this file?</p>
-                                                <PrimaryButton text="Download" onClick={handleDownload} />
-                                            </div>
-                                        </Callout>
-                                    )}
+                                    </div>
                                 </div>
                             ) 
                         }
