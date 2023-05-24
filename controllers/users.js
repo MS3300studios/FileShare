@@ -143,12 +143,7 @@ router.get('/users/userphoto/:userId', auth, (req, res) => {
 })
 
 router.post('/users/edit', auth, (req, res) => {
-    console.log(req.body)
     User.findById(req.userData.userId).exec().then(async user => {
-        console.log(req.body.nickname)
-        console.log(req.body.email)
-        console.log(req.body.photo)
-
         let nickNameTaken = false;
         let emailTaken = false;
 
@@ -186,6 +181,10 @@ router.post('/users/edit', auth, (req, res) => {
                     uconv.participants.forEach((part, ind) => {
                         if(part._id.toString() === req.userData.userId){
                             uconv.participants[ind].nickname = req.body.nickname;
+                            uconv.participants[ind].email = req.body.email;
+                            if(req.body.photo !== ""){
+                                uconv.participants[ind].photo = req.body.photo;
+                            }
                         } else {
                             otherUser = part;
                         }
@@ -202,7 +201,24 @@ router.post('/users/edit', auth, (req, res) => {
                     uconv.save()
                 })
 
-                res.sendStatus(200)
+                Contacts.find().exec().then(allContactsLists => {
+                    allContactsLists.forEach((oneContactsList, i) => {
+                        oneContactsList.contacts.forEach((contact, id) => {
+                            if(contact._id.toString() === req.userData.userId){
+                                oneContactsList.contacts[id].nickname = req.body.nickname;
+                                oneContactsList.contacts[id].email = req.body.email;
+                                if(req.body.photo !== ""){
+                                    oneContactsList.contacts[id].photo = req.body.photo;
+                                }
+                            }
+                        })
+
+                        oneContactsList.markModified('contacts');
+                        oneContactsList.save();
+                    })
+                    
+                    res.sendStatus(200)
+                })
             })
         })
     })
