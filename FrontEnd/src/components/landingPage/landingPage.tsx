@@ -67,17 +67,18 @@ export default function LandingPage(){
                         { files.length === 0 ? <p style={{fontSize: "20px", fontWeight: "500"}}>You don't have any files yet, click the button on the top menu to add files</p> : (
                             <div className={styles.cardsContainer}>
                                 { files.filter(file => file.name.toLowerCase().includes(filterText.toLowerCase())).map((item, id) => (
-                                    <Card 
-                                        key={id}
-                                        id={item._id}
-                                        userId={item.userId}
-                                        name={item.name}
-                                        docType={item.type}
-                                        ext={item.extension}
-                                        size={item.size}
-                                        uploadedAt={item.createdAt}
-                                        modalHandler={modalHandler}
-                                    />
+                                    <div style={{margin: "5px"}} key={id}>
+                                        <Card 
+                                            id={item._id}
+                                            userId={item.userId}
+                                            name={item.name}
+                                            docType={item.type}
+                                            ext={item.extension}
+                                            size={item.size}
+                                            uploadedAt={item.createdAt}
+                                            modalHandler={modalHandler}
+                                        />
+                                    </div>
                                 )) }
                             </div>
                         ) }
