@@ -11,6 +11,7 @@ router.use(express.urlencoded({limit: '10mb', extended: true}));
 
 const User = require("../models/User").User;
 const Contacts = require("../models/ContactsList");
+const { Conversation } = require('../models/Chat');
 
 router.get('/users/verifyToken/:token', (req, res) => {
     try{
@@ -167,12 +168,42 @@ router.post('/users/edit', auth, (req, res) => {
             return;
         }
 
+        const userOldNickname = user.nickname;
         user.nickname = req.body.nickname;
         user.email = req.body.email;
         if(req.body.photo !== "") user.photo = req.body.photo;
 
         user.save().then(resp => {
-            res.sendStatus(200)
+            Conversation.find().exec().then(convs => {
+                const userParticipatingConvs = convs.filter(conv => {
+                    const participantsIds = conv.participants.map(partip => partip._id.toString());
+                    if(participantsIds.indexOf(req.userData.userId) !== -1) 
+                        return true
+                })
+
+                userParticipatingConvs.forEach(uconv => {
+                    let otherUser;
+                    uconv.participants.forEach((part, ind) => {
+                        if(part._id.toString() === req.userData.userId){
+                            uconv.participants[ind].nickname = req.body.nickname;
+                        } else {
+                            otherUser = part;
+                        }
+                    })
+                    
+                    uconv.messages.forEach((message, index) => {
+                        if(otherUser.nickname !== message.authorNickname){
+                            uconv.messages[index].authorNickname = req.body.nickname;
+                        }
+                    })
+
+                    uconv.markModified('messages');
+                    uconv.markModified('participants');
+                    uconv.save()
+                })
+
+                res.sendStatus(200)
+            })
         })
     })
 })

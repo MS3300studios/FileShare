@@ -33,7 +33,7 @@
 .messagesContainer{
     overflow-y: auto;
     width: 100%;
-    min-height: 80%;
+    min-height: 100%;
 }
 
 .messageWrapper{

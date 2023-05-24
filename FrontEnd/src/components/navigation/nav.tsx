@@ -82,6 +82,7 @@ export default function Navigation(){
                         checked
                     />
                 </Link>
+                <div style={{marginLeft: "10px"}}></div>
                 <Dropdown
                     placeholder="Navigate"
                     selectedKey={dropdownOption}
@@ -89,6 +90,7 @@ export default function Navigation(){
                     className={styles.smallMenu}
                     onChange={(event, item) => onDropdownSelectChange(item)}
                 />
+                <div style={{marginRight: "10px"}}></div>
                 <p className={styles.usernickname}>{userData.nickname}</p>
                 <div className={styles.profile}>
                     { loadingPhoto ? <Spinner size={SpinnerSize.medium} /> : <img src={userPhoto} alt="your profile picture" /> }

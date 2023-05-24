@@ -80,6 +80,9 @@ const ChatComponent = ({socket}: any) => {
     const selfUser = getUser();
     let otherUser: any;
     if(!loadingMessages){
+        console.log(selfUser.nickname)
+        console.log(currentConversation.participants[0].nickname);
+        console.log(currentConversation.participants[1].nickname);
         otherUser = currentConversation.participants.filter((el: any) => el.nickname !== selfUser.nickname)[0]
     }
 
@@ -115,7 +118,7 @@ const ChatComponent = ({socket}: any) => {
                                         <div className={styles.message} style={isSelf ? { backgroundColor: "lightblue" } : { backgroundColor: "lightcoral" }}>
                                             <div className={styles.messageInfoContainer}>
                                                 <h3>{msg.authorNickname}</h3>
-                                                <h3>{messageDate}</h3>
+                                                <p style={{marginLeft: "3px"}}>{messageDate}</p>
                                             </div>
                                             <p>{msg.text}</p>
                                         </div>
