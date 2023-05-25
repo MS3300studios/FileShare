@@ -20,6 +20,8 @@ const socket = io("http://localhost:3000");
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [loadingIsLoggedIn, setLoadingIsLoggedIn] = React.useState(true);
+  const [loadingConversations, setLoadingConversations] = React.useState(true);
+  const [conversations, setConversations] = React.useState([]);
 
   React.useEffect(() => {
     setLoadingIsLoggedIn(true);
@@ -39,32 +41,43 @@ function App() {
         setIsLoggedIn(false)
       }
     })
+
+    fetch(`http://localhost:3000/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
+      if(resp.status === 200) {
+        setLoadingConversations(false)
+      }
+    })
   }, [])
 
-  if(loadingIsLoggedIn){
-    return <Spinner size={SpinnerSize.large} />
-  }
+  React.useEffect(() => {
+    console.log(conversations)
+  }, [loadingConversations])
 
   return (
     <BrowserRouter>
-      <div className="App">
-        {
-          isLoggedIn ? (
-            <>
-            <Navigation />
-            <Routes>
-              <Route path='/' index element={<LandingPage />} />
-              <Route path='/file/add' element={<AddFile />} />
-              <Route path='/contacts' element={<Contacts />} />
-              <Route path='/shared' element={<Shared />} />
-              <Route path='/conversations' element={<Conversations />} />
-              <Route path='/user/edit' element={<EditProfile />} />
-              <Route path='/chat/:contactId' element={<Chat socket={socket} />} />
-            </Routes>
-            </>
-          ) : <Login />
-        }
-      </div>
+    {
+      loadingIsLoggedIn ? <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100vh"}}>
+      <Spinner size={SpinnerSize.large} /> </div> : (
+        <div className="App">
+          {
+            isLoggedIn ? (
+              <>
+              <Navigation />
+              <Routes>
+                <Route path='/' index element={<LandingPage />} />
+                <Route path='/file/add' element={<AddFile />} />
+                <Route path='/contacts' element={<Contacts />} />
+                <Route path='/shared' element={<Shared />} />
+                <Route path='/conversations' element={<Conversations />} />
+                <Route path='/user/edit' element={<EditProfile />} />
+                <Route path='/chat/:contactId' element={<Chat socket={socket} />} />
+              </Routes>
+              </>
+            ) : <Login />
+          }
+        </div>
+      )
+    }
     </BrowserRouter>
   )
 }

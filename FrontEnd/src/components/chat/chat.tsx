@@ -28,7 +28,8 @@ const ChatComponent = ({socket}: any) => {
     const navigate = useNavigate();
     const contactId = location.pathname.slice(location.pathname.lastIndexOf('/')+1, location.pathname.length)
     const userData = getUser();
-    const messagesEndRef = React.useRef(null)
+    const messagesEndRef = React.useRef(null);
+    const afterMsgAnchor = React.useRef(null);
     
     React.useEffect(() => {
         socket.on("receiveMessage", (message: ISocketMessage) => {
@@ -42,11 +43,11 @@ const ChatComponent = ({socket}: any) => {
         fetch(`http://localhost:3000/conversation/${contactId}`, 
             { headers: { Authorization: getToken() } 
         }).then(resp => {
-            return resp.json()
+            return resp.json();
         }).then(data => {
-            setMessages(data.messages)
-            setLoadingMessages(false)
-            setCurrentConversation(data)
+            setMessages(data.messages);
+            setLoadingMessages(false);
+            setCurrentConversation(data);
         }).catch(err => {
             console.log(err)
             setLoadingMessages(false)
@@ -61,6 +62,7 @@ const ChatComponent = ({socket}: any) => {
     React.useEffect(() => {
         if(!loadingMessages){
             socket.emit('join', { conversationId: currentConversation._id });
+            (afterMsgAnchor.current as any).scrollIntoView({ behavior: "smooth" });
         }
     }, [loadingMessages])
 
@@ -80,9 +82,6 @@ const ChatComponent = ({socket}: any) => {
     const selfUser = getUser();
     let otherUser: any;
     if(!loadingMessages){
-        console.log(selfUser.nickname)
-        console.log(currentConversation.participants[0].nickname);
-        console.log(currentConversation.participants[1].nickname);
         otherUser = currentConversation.participants.filter((el: any) => el.nickname !== selfUser.nickname)[0]
     }
 
@@ -115,9 +114,9 @@ const ChatComponent = ({socket}: any) => {
                                 const messageDate = moment(msg.createdAt).format("MMMM Do YYYY, h:mm a")
                                 return (
                                     <div key={id} className={styles.messageWrapper} style={isSelf ? { justifyContent: "flex-end" } : { justifyContent: "flex-start"} } >
-                                        <div className={styles.message} style={isSelf ? { backgroundColor: "lightblue" } : { backgroundColor: "lightcoral" }}>
+                                        <div className={styles.message} style={isSelf ? { backgroundColor: "hsl(214.9, 96.1%, 80%)" } : { backgroundColor: "hsl(215, 60%, 60%)" }}>
                                             <div className={styles.messageInfoContainer}>
-                                                <h3>{msg.authorNickname}</h3>
+                                                <h3 style={{maxWidth: "180px"}}>{msg.authorNickname}</h3>
                                                 <p style={{marginLeft: "3px"}}>{messageDate}</p>
                                             </div>
                                             <p>{msg.text}</p>
@@ -126,7 +125,8 @@ const ChatComponent = ({socket}: any) => {
                                     </div>
                                 )
                             })
-}
+                        }
+                        <div ref={afterMsgAnchor}></div>
                     </div>
                     <div className={styles.inputContainer}>
                         <TextField

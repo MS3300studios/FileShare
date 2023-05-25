@@ -42,7 +42,7 @@
 }
 
 .message{
-    width: 300px;
+    width: 370px;
     margin: 10px;
     word-wrap: break-word;
     border-radius: 5px;
@@ -57,7 +57,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    background-color: lightskyblue;
+    background-color: hsl(214.9, 96.1%, 60%);
     padding: 10px 0px;
     padding-left: 20px;
     position: sticky;
