@@ -1,6 +1,6 @@
 import * as React from "react";
 import moment from "moment";
-import { DocumentCard, DocumentCardActivity, DocumentCardPreview, DocumentCardTitle, IDocumentCardPreviewProps, Spinner, SpinnerSize } from "@fluentui/react";
+import { DocumentCard, DocumentCardActivity, DocumentCardPreview, DocumentCardTitle, IDocumentCardPreviewProps, ImageFit, Spinner, SpinnerSize } from "@fluentui/react";
 import unknownImage from "../../assets/unknown.png";
 import archiveImage from "../../assets/archive.png";
 import photoImage from "../../assets/photo.png";
@@ -78,8 +78,9 @@ export default function Card({ id, userId, name, size, uploadedAt, ext, docType,
                             target: '_blank',
                         },
                         previewImageSrc: resolveSrc(docType),
-                        width: 200,
-                        height: 200,
+                        imageFit: ImageFit.contain,
+                        width: 120,
+                        height: 120,
                     },
                 ],
             })

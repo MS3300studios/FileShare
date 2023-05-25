@@ -1,0 +1,39 @@
+.slideIn {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: hsla(300, 100%, 97%, 1);
+    animation: slide 0.3s ease forwards, fadeOut 0.5s 5s forwards;
+    z-index: 100;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.slideIn > p{
+    word-wrap: break-word;
+}
+
+@keyframes slide {
+    0% {
+        top: -100px;
+    }
+    80% {
+        top: calc(10vh - 100px);
+    }
+    100% {
+        top: calc(10vh - 100px);
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

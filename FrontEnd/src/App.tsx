@@ -2,26 +2,33 @@ import * as React from "react";
 import Navigation from './components/navigation/nav';
 import LandingPage from './components/landingPage/landingPage';
 import './App.css'
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import AddFile from './components/addFile/addFile';
 import { Login } from './components/login/login';
-import { Spinner, SpinnerSize, initializeIcons } from '@fluentui/react';
+import { MessageBar, MessageBarType, Spinner, SpinnerSize, initializeIcons } from '@fluentui/react';
 initializeIcons();
 import { getToken } from './utils/getToken';
 import Contacts from "./components/contacts/contacts";
 import EditProfile from "./components/profile/editUserProfile";
 import Shared from "./components/shared/shared";
-import Chat from "./components/chat/chat";
+import Chat, { ISocketMessage } from "./components/chat/chat";
 import Conversations from "./components/conversations/conversations";
 import io from 'socket.io-client';
 
 const socket = io("http://localhost:3000");
+
+interface IConversationInfo{
+  show: boolean;
+  messageData: ISocketMessage;
+}
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [loadingIsLoggedIn, setLoadingIsLoggedIn] = React.useState(true);
   const [loadingConversations, setLoadingConversations] = React.useState(true);
   const [conversations, setConversations] = React.useState([]);
+  const [messageBar, setMessageBar] = React.useState({show: false, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"});
+  const [converationInfo, setConversationInfo] = React.useState<IConversationInfo>({show: false, messageData: null as any })
 
   React.useEffect(() => {
     setLoadingIsLoggedIn(true);
@@ -43,14 +50,30 @@ function App() {
     })
 
     fetch(`http://localhost:3000/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
-      if(resp.status === 200) {
-        setLoadingConversations(false)
-      }
+      return resp.json()
+    }).then(data => {
+      setConversations(data)
+      setLoadingConversations(false)
+    }).catch(err => {
+      setMessageBar({show: true, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"})
+      console.log(err)
     })
   }, [])
 
   React.useEffect(() => {
-    console.log(conversations)
+    if(!loadingConversations){
+      conversations.forEach(conv => {
+        socket.emit('join', { conversationId: (conv as any)._id });
+      })
+
+      socket.on("receiveMessage", (message: ISocketMessage) => {
+        setConversationInfo({show: true, messageData: message})
+      })
+    }
+
+    return () => {
+      socket.off("receiveMessage");
+    };
   }, [loadingConversations])
 
   return (
@@ -59,6 +82,20 @@ function App() {
       loadingIsLoggedIn ? <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100vh"}}>
       <Spinner size={SpinnerSize.large} /> </div> : (
         <div className="App">
+          { messageBar.show &&
+              <>
+                  <div style={{marginTop: "10px"}}></div>
+                  <MessageBar messageBarType={messageBar.type}>
+                      {messageBar.text}
+                  </MessageBar> 
+              </>
+          }
+          { converationInfo.show &&
+              <div className="slideIn">
+                <b>User <span style={{textDecoration: "underline"}}>{converationInfo.messageData.message.authorNickname}</span> has written to you</b>
+                <p>{converationInfo.messageData.message.text}</p>
+              </div>
+          }
           {
             isLoggedIn ? (
               <>

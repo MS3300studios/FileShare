@@ -7,7 +7,7 @@ import { getToken } from '../../utils/getToken';
 import { getUser } from '../../utils/getUser';
 import moment from 'moment';
 
-interface ISocketMessage{
+export interface ISocketMessage{
     userId: string; //socket uuid
     message: {
         conversationId: string, 
@@ -33,7 +33,6 @@ const ChatComponent = ({socket}: any) => {
     
     React.useEffect(() => {
         socket.on("receiveMessage", (message: ISocketMessage) => {
-            console.log(message)
             setMessages(prevMessages => [...prevMessages, message.message]);
             setTimeout(() => {
                 (messagesEndRef.current as any).scrollIntoView({ behavior: "smooth" })
@@ -61,7 +60,6 @@ const ChatComponent = ({socket}: any) => {
 
     React.useEffect(() => {
         if(!loadingMessages){
-            socket.emit('join', { conversationId: currentConversation._id });
             (afterMsgAnchor.current as any).scrollIntoView({ behavior: "smooth" });
         }
     }, [loadingMessages])
