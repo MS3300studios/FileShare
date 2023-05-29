@@ -82,7 +82,6 @@ export default function Navigation(){
                         checked
                     />
                 </Link>
-                <div style={{marginLeft: "10px"}}></div>
                 <Dropdown
                     placeholder="Navigate"
                     selectedKey={dropdownOption}

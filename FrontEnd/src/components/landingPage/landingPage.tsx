@@ -2,7 +2,7 @@ import * as React from "react";
 import styles from "./landingPage.module.css";
 import Card from "./card";
 import { IFile } from "../addFile/addFile";
-import { Dropdown, DropdownMenuItemType, IDropdownOption, Spinner, SpinnerSize, TextField } from "@fluentui/react";
+import { Dropdown, DropdownMenuItemType, IDropdownOption, PrimaryButton, Spinner, SpinnerSize, TextField, Toggle } from "@fluentui/react";
 import { getToken } from "../../utils/getToken";
 import FileDetails from "./fileDetails";
 import { getUser } from "../../utils/getUser";
@@ -14,6 +14,7 @@ export default function LandingPage(){
     const [openedFileId, setOpenedFileId] = React.useState<string | undefined>("");
     const [filterText, setFilterText] = React.useState("");
     const [dropdownOption, setDropdownOption] = React.useState<string>("")
+    const [sortAscending, setSortAscending] = React.useState(true);
 
     React.useEffect(() => {
         fetch(`http://localhost:3000/files`, { headers: { Authorization: getToken() } }).then(resp => {
@@ -84,6 +85,10 @@ export default function LandingPage(){
         }
     }
 
+    const onSortDate = (ev: React.MouseEvent<HTMLElement>, checked?: boolean) => {
+        setSortAscending((checked as boolean));
+    }
+
     return(
         <main>
             <h1 style={{textAlign: "center"}}>Your files</h1>
@@ -96,6 +101,9 @@ export default function LandingPage(){
                     className={styles.smallMenu}
                     onChange={(event, item) => onDropdownSelectChange(item)}
                 />
+                <div style={{display: "flex", justifyContent: "center", width: "100%"}}>
+                    <Toggle label="Show newest files on top" onText="yes" offText="no" onChange={onSortDate} defaultChecked />
+                </div>
             </div>
             { isModalOpened && <FileDetails 
                 authorData={getUser().nickname} 
@@ -108,7 +116,20 @@ export default function LandingPage(){
                     <article>
                         { files.length === 0 ? <p style={{fontSize: "20px", fontWeight: "500"}}>You don't have any files yet, click the button on the top menu to add files</p> : (
                             <div className={styles.cardsContainer}>
-                                { files.filter(file => file.type.includes(dropdownOption)).filter(file => file.name.toLowerCase().includes(filterText.toLowerCase())).map((item, id) => (
+                                { sortAscending ? files.filter(file => file.type.includes(dropdownOption)).filter(file => file.name.toLowerCase().includes(filterText.toLowerCase())).reverse().map((item, id) => (
+                                    <div style={{margin: "5px"}} key={id}>
+                                        <Card 
+                                            id={item._id}
+                                            userId={item.userId}
+                                            name={item.name}
+                                            docType={item.type}
+                                            ext={item.extension}
+                                            size={item.size}
+                                            uploadedAt={item.createdAt}
+                                            modalHandler={modalHandler}
+                                        />
+                                    </div>
+                                )) : files.filter(file => file.type.includes(dropdownOption)).filter(file => file.name.toLowerCase().includes(filterText.toLowerCase())).map((item, id) => (
                                     <div style={{margin: "5px"}} key={id}>
                                         <Card 
                                             id={item._id}

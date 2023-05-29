@@ -16,6 +16,7 @@ interface PersonDTO{
 export default function Contacts(){
     const navigate = useNavigate();
     const [contacts, setContacts] = React.useState<PersonDTO[]>();
+    const [contactsFilter, setContactsFilter] = React.useState("");
     const [isLoading, setIsLoading] = React.useState(true);
     const [isModalOpened, setIsModalOpened] = React.useState(false);
     const [loadingPeople, setLoadingPeople] = React.useState(false);
@@ -134,11 +135,23 @@ export default function Contacts(){
         });
     }
 
+    const filterContacts = (el: PersonDTO) => {
+        if(contactsFilter === "")
+            return true
+        if(contactsFilter.indexOf("@") !== -1)
+            return el.email.toLowerCase().includes(contactsFilter.toLowerCase())
+            
+        return el.nickname.toLowerCase().includes(contactsFilter.toLowerCase())
+    }
+
     return (
         <>
         { contacts?.length !== 0 && <div style={{width: "100%", display: "flex", justifyContent: "center", marginTop: "5px"}}>
             <PrimaryButton onClick={getRandomContacts}>{loadingPeople ? "Please wait" : "Add contacts"}</PrimaryButton>
         </div>}
+        <div className={styles.filterContainer}>
+            <TextField placeholder="filter users by nickname or e-mail" className={styles.filterClass} value={contactsFilter} onChange={(e) => setContactsFilter(e.currentTarget.value)}/>
+        </div>
         <div className={styles.container}>
             {
                 isLoading ? <Spinner size={SpinnerSize.large} /> : (<>
@@ -146,7 +159,7 @@ export default function Contacts(){
                         {
                             <div style={{width: "80%"}}>
                             {
-                                contacts.map((el, id) => { 
+                                contacts.filter(el => filterContacts(el)).map((el, id) => { 
                                     return (
                                         <div className={styles.singleContact} key={id}>
                                             <Persona 
