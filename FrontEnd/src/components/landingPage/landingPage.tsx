@@ -110,7 +110,6 @@ export default function LandingPage(){
                             <div className={styles.cardsContainer}>
                                 { files.filter(file => file.type.includes(dropdownOption)).filter(file => file.name.toLowerCase().includes(filterText.toLowerCase())).map((item, id) => (
                                     <div style={{margin: "5px"}} key={id}>
-                                        <h1>{item.type}</h1>
                                         <Card 
                                             id={item._id}
                                             userId={item.userId}
