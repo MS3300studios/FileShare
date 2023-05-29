@@ -4,5 +4,6 @@
 }
 
 .conversationsMainContainer{
-    
+    display: flex;
+    flex-wrap: wrap;
 }

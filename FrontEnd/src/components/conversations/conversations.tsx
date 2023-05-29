@@ -33,11 +33,11 @@ const Conversation = ({ conversation, navigate }: {conversation: IConversation, 
     }
 
     return (
-        <div onClick={() => navigate(contactData._id)}>
         <DocumentCard
-                aria-label="conversation"
-                onClick={() => console.log('ok')}
-            >
+            aria-label="conversation"
+            onClick={() => navigate(contactData._id)}
+            style={{margin: "10px"}}
+        >
             <DocumentCardPreview {...previewProps} />
             <DocumentCardTitle
                 title={contactData.nickname}
@@ -45,7 +45,6 @@ const Conversation = ({ conversation, navigate }: {conversation: IConversation, 
             />
             <DocumentCardActivity activity={activity} people={DocumentCardActivityPeople} />
         </DocumentCard>
-        </div>
     )
 }
 
@@ -70,7 +69,6 @@ const Conversations = () => {
 
     React.useEffect(() => {
         const token = getToken();
-        console.log(token)
 
         fetch(`http://localhost:3000/conversations`, 
             { headers: { Authorization: token }
@@ -79,7 +77,6 @@ const Conversations = () => {
             return response.json();
         })
         .then((data) => {
-            console.log(data);
             setConversations(data);
             setIsloading(false);
         })
@@ -101,9 +98,7 @@ const Conversations = () => {
             <div className={styles.conversationsMainContainer}>
             {
                 conversations.map((el, key) => (
-                    <div key={key}>
-                        <Conversation conversation={el} navigate={redirectToChat}/>
-                    </div>
+                    <Conversation key={key} conversation={el} navigate={redirectToChat}/>
                 ))
             }
             </div>
