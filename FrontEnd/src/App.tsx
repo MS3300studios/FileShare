@@ -67,7 +67,14 @@ function App() {
       })
 
       socket.on("receiveMessage", (message: ISocketMessage) => {
-        setConversationInfo({show: true, messageData: message})
+        if(!window.location.href.includes("chat")){
+          setConversationInfo({show: true, messageData: message})
+        }
+
+        // setConversationInfo({show: true, messageData: message})
+        // setTimeout(() => {
+        //   setConversationInfo({show: false, messageData: message})
+        // }, 5100);
       })
     }
 

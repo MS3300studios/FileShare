@@ -7,6 +7,7 @@ const path = require('path');
 const File = require('../models/File');
 const User = require('../models/User').User;
 const fs = require('fs');
+const mongoose = require("mongoose");
 
 router.use(cors());
 
@@ -83,6 +84,22 @@ router.get('/files/shared', auth, (req, res) => {
         console.log(err)
         res.status(500).json({ error: err })
     })
+})
+
+router.get('/files/shared/remove/:fileId', auth, (req, res) => {
+    if(!mongoose.Types.ObjectId.isValid(req.params.fileId)){
+        res.sendStatus(400);
+    };
+    File.findById(req.params.fileId).exec().then(file => {
+        const newParticipants = file.participants.filter(partip => partip._id.toString() !== req.userData.userId);
+        file.participants = newParticipants;
+        file.save().then(resp => {
+            res.sendStatus(200);
+        }).catch(err => {
+            console.log(err);
+            res.sendStatus(500);
+        })
+    });
 })
 
 router.get('/files/download/:fileId', auth, async (req, res) => {

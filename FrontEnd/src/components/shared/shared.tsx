@@ -10,7 +10,6 @@ const Shared = () => {
     const [files, setFiles] = React.useState<any[]>([]);
     const [fileToDownloadId, setFileToDownloadId] = React.useState<string>("");
     const [filterText, setFilterText] = React.useState("");
-    const targetRef = React.useRef<HTMLDivElement | null>(null);
 
     React.useEffect(() => {
         fetch(`http://localhost:3000/files/shared/`, { headers: { Authorization: getToken() } })
@@ -31,6 +30,7 @@ const Shared = () => {
     }
 
     const toggleCallout = () => {
+        console.log("ok?")
         setIsCalloutVisible(prev => !prev)
         setFileToDownloadId("");
     }
@@ -46,13 +46,13 @@ const Shared = () => {
                 const targetFile = files.filter(f => f._id === fileToDownloadId)[0] //always unique
                 
                 response.blob().then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = targetFile.name;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = targetFile.name;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
                 });
             }
         }).catch(err => {
@@ -63,6 +63,21 @@ const Shared = () => {
 
     const handleFileSearch = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFilterText(e.currentTarget.value)
+    }
+
+    const handleRemoveFromList = () => {
+        fetch(`http://localhost:3000/files/shared/remove/${fileToDownloadId}`, 
+            { headers: { Authorization: getToken() }
+        })
+        .then(response => {
+            if (response.ok) {
+                const newFiles = files.filter(f => f._id !== fileToDownloadId);
+                setFiles(newFiles);
+            }
+        }).catch(err => {
+            console.log(err)
+            alert('an unexpected error ocurred while processing the request. Please reload the page and try again.')
+        })
     }
 
     return (
@@ -79,12 +94,12 @@ const Shared = () => {
                             ) : (
                                 <div style={{width: "80%", margin: "0 auto"}}>
                                     <h1>Files shared with me</h1>
-                                    <div style={{ width: "40%", margin: "0 auto", marginBottom: "10px" }} ref={targetRef}>
+                                    <div style={{ width: "40%", margin: "0 auto", marginBottom: "10px" }} id="header">
                                         <TextField placeholder="search for file name" onChange={handleFileSearch} value={filterText} />
                                     </div>
                                     <div style={{width: "100%", display: "flex", flexWrap: "wrap"}}>
                                     { files.filter(file => file.name.toLowerCase().includes(filterText.toLowerCase())).map((item, id) => (
-                                        <div key={id} style={{margin: "5px"}}>
+                                        <div key={id} id={`btn_${id}`} style={{margin: "5px"}}>
                                             <Card 
                                                 id={item._id}
                                                 userId={item.userId}
@@ -95,11 +110,20 @@ const Shared = () => {
                                                 uploadedAt={item.createdAt}
                                                 modalHandler={modalHandler}
                                             />
-                                            {isCalloutVisible && (
-                                                <Callout target={targetRef.current} onDismiss={toggleCallout}>
+                                            {(isCalloutVisible && fileToDownloadId === item._id) && (
+                                                <Callout
+                                                    coverTarget
+                                                    role="dialog"
+                                                    className={styles.callout}
+                                                    onDismiss={toggleCallout}
+                                                    target={`#btn_${id}`}
+                                                    isBeakVisible={false}
+                                                    setInitialFocus
+                                                >
                                                     <div className={styles.calloutInternalContainer}>
                                                         <p>Do you want to download this file?</p>
                                                         <PrimaryButton text="Download" onClick={handleDownload} />
+                                                        <PrimaryButton text="Remove from my shared list" onClick={handleRemoveFromList} style={{backgroundColor: "salmon", marginTop: "10px"}} />
                                                     </div>
                                                 </Callout>
                                             )}

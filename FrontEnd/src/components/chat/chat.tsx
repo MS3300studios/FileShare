@@ -47,6 +47,10 @@ const ChatComponent = ({socket}: any) => {
             setMessages(data.messages);
             setLoadingMessages(false);
             setCurrentConversation(data);
+
+            if(data.messages.length === 0){
+                socket.emit('join', { conversationId: (data as any)._id });
+            }
         }).catch(err => {
             console.log(err)
             setLoadingMessages(false)
