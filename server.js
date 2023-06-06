@@ -9,7 +9,8 @@ const PORT = 3000;
 const app = express();
 const socketCorsOptions = {
     cors: true,
-    origin: ['http://localhost:5173']
+    origin: ['*']
+    // origin: ['http://localhost:5173']
 }
 const serverCorsOptions = {
     origin: "http://localhost:5173"
@@ -20,6 +21,8 @@ app.use(require('./controllers/contacts'));
 app.use(require('./controllers/files'));
 app.use(require('./controllers/conversation'));
 app.use(cors(serverCorsOptions));
+app.use(cors());
+
 
 const server = app.listen(PORT, () => {
     console.log('server is started')

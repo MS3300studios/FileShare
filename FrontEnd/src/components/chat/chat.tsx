@@ -17,7 +17,8 @@ export interface ISocketMessage{
     }
 }
 
-const ChatComponent = ({socket}: any) => {
+// const ChatComponent = ({socket, onChatUnload}: any) => {
+const ChatComponent = ({socket, onChatUnload}: any) => {
     const [loadingMessages, setLoadingMessages] = useState(true);
     const [messages, setMessages] = useState<ISocketMessage["message"][]>([]);
     const [newMessage, setNewMessage] = useState('');
@@ -59,6 +60,7 @@ const ChatComponent = ({socket}: any) => {
 
         return () => {
             socket.off("receiveMessage");
+            // onChatUnload()
         };
     }, [])
 

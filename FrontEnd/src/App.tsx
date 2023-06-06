@@ -46,8 +46,10 @@ function App() {
       else if(resp.status === 401){
         setLoadingIsLoggedIn(false);
         setIsLoggedIn(false)
+        setMessageBar({show: true, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"})
+        alert("an error occurred, please reload the page and try again")
       }
-    })
+    }).catch(err => setMessageBar({show: true, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"}))
 
     fetch(`http://localhost:3000/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
       return resp.json()
@@ -56,6 +58,7 @@ function App() {
       setLoadingConversations(false)
     }).catch(err => {
       setMessageBar({show: true, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"})
+      alert("an error occurred, please reload the page and try again")
       console.log(err)
     })
   }, [])
@@ -82,6 +85,22 @@ function App() {
       socket.off("receiveMessage");
     };
   }, [loadingConversations])
+
+  // const loadConversations = () => {
+  //   console.log('loading conversation new')
+
+  //   setLoadingConversations(true);
+  //   fetch(`http://localhost:3000/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
+  //     return resp.json()
+  //   }).then(data => {
+  //     setConversations(data)
+  //     setLoadingConversations(false)
+  //   }).catch(err => {
+  //     setMessageBar({show: true, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"})
+  //     alert("an error occurred, please reload the page and try again")
+  //     console.log(err)
+  //   })
+  // }
 
   return (
     <BrowserRouter>
@@ -114,6 +133,7 @@ function App() {
                 <Route path='/shared' element={<Shared />} />
                 <Route path='/conversations' element={<Conversations />} />
                 <Route path='/user/edit' element={<EditProfile />} />
+                {/* <Route path='/chat/:contactId' element={<Chat socket={socket} onChatUnload={loadConversations} />} /> */}
                 <Route path='/chat/:contactId' element={<Chat socket={socket} />} />
               </Routes>
               </>
