@@ -40,7 +40,7 @@ const ChatComponent = ({socket, onChatUnload}: any) => {
             }, 200);
         })
 
-        fetch(`http://localhost:3000/conversation/${contactId}`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/conversation/${contactId}`, 
             { headers: { Authorization: getToken() } 
         }).then(resp => {
             return resp.json();

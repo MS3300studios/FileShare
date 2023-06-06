@@ -12,7 +12,7 @@ const Shared = () => {
     const [filterText, setFilterText] = React.useState("");
 
     React.useEffect(() => {
-        fetch(`http://localhost:3000/files/shared/`, { headers: { Authorization: getToken() } })
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/shared/`, { headers: { Authorization: getToken() } })
         .then(resp => {
             return resp.json();
         }).then(data => {
@@ -38,7 +38,7 @@ const Shared = () => {
     const handleDownload = () => {
         if(fileToDownloadId === "") return;
 
-        fetch(`http://localhost:3000/files/download/${fileToDownloadId}`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/download/${fileToDownloadId}`, 
             { headers: { Authorization: getToken() }
         })
         .then(response => {
@@ -66,7 +66,7 @@ const Shared = () => {
     }
 
     const handleRemoveFromList = () => {
-        fetch(`http://localhost:3000/files/shared/remove/${fileToDownloadId}`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/shared/remove/${fileToDownloadId}`, 
             { headers: { Authorization: getToken() }
         })
         .then(response => {

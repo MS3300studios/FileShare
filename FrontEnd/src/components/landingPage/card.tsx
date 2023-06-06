@@ -64,7 +64,7 @@ export default function Card({ id, userId, name, size, uploadedAt, ext, docType,
     });
 
     React.useEffect(() => {
-        fetch(`http://localhost:3000/users/getUser/${userId}`,
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/users/getUser/${userId}`,
             { headers: { Authorization: getToken() } 
         }).then(resp => resp.json()).then(data => {
             setIsLoadingUser(false);

@@ -70,7 +70,7 @@ const Conversations = () => {
     React.useEffect(() => {
         const token = getToken();
 
-        fetch(`http://localhost:3000/conversations`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/conversations`, 
             { headers: { Authorization: token }
         })
         .then(response => {

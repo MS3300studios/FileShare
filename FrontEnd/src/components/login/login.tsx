@@ -32,7 +32,7 @@ export function Login(){
         if(email.length <= 0 || password.length <= 0)
             return
 
-        fetch("http://localhost:3000/users/login", {
+        fetch("https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/users/login", {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -59,7 +59,7 @@ export function Login(){
     }
 
     const register = () => {
-        fetch("http://localhost:3000/users/register", {
+        fetch("https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/users/register", {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'

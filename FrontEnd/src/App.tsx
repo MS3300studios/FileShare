@@ -15,7 +15,9 @@ import Chat, { ISocketMessage } from "./components/chat/chat";
 import Conversations from "./components/conversations/conversations";
 import io from 'socket.io-client';
 
-const socket = io("http://localhost:3000");
+const socket = io("https://limba.wzks.uj.edu.pl", {
+  path: "/20_strusinski/aplikacja"
+});
 
 interface IConversationInfo{
   show: boolean;
@@ -38,7 +40,7 @@ function App() {
       setIsLoggedIn(false)
       return;
     }
-    fetch(`http://localhost:3000/users/verifyToken/${token}`).then(resp => {
+    fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/users/verifyToken/${token}`).then(resp => {
       if(resp.status === 200) {
         setLoadingIsLoggedIn(false);
         setIsLoggedIn(true)
@@ -51,7 +53,7 @@ function App() {
       }
     }).catch(err => setMessageBar({show: true, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"}))
 
-    fetch(`http://localhost:3000/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
+    fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
       return resp.json()
     }).then(data => {
       setConversations(data)
@@ -90,7 +92,7 @@ function App() {
   //   console.log('loading conversation new')
 
   //   setLoadingConversations(true);
-  //   fetch(`http://localhost:3000/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
+  //   fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
   //     return resp.json()
   //   }).then(data => {
   //     setConversations(data)
@@ -103,7 +105,7 @@ function App() {
   // }
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/20_strusinski/aplikacja">
     {
       loadingIsLoggedIn ? <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100vh"}}>
       <Spinner size={SpinnerSize.large} /> </div> : (

@@ -3,26 +3,27 @@ const socket = require("socket.io");
 const auth = require("./middleware/authorization");
 const cors = require("cors");
 const { messageSchema, Conversation } = require("./models/Chat");
+const path = require("path");
 require('dotenv').config()
 
-const PORT = 3000;
+const PORT = 2305;
 const app = express();
 const socketCorsOptions = {
     cors: true,
     origin: ['*']
     // origin: ['http://localhost:5173']
 }
-const serverCorsOptions = {
-    origin: "http://localhost:5173"
-}
+// const serverCorsOptions = {
+//     origin: "http://localhost:5173"
+// }
 
 app.use(require('./controllers/users'));
 app.use(require('./controllers/contacts'));
 app.use(require('./controllers/files'));
 app.use(require('./controllers/conversation'));
-app.use(cors(serverCorsOptions));
 app.use(cors());
 
+app.use(express.static(path.join(__dirname, 'assets')));
 
 const server = app.listen(PORT, () => {
     console.log('server is started')
@@ -31,11 +32,12 @@ const server = app.listen(PORT, () => {
 const io = socket(server, socketCorsOptions);
 
 app.get('/', (req, res) => {
-    res.send('ok')
+    // res.send('ok')
+    res.sendFile(path.join(__dirname, 'index.html'))
 })
 
-app.get('/auth', auth, (req, res) => {
-    res.send('ok')
+app.get('/test', (req, res) => {
+    res.send('ok test')
 })
 
 io.on("connection", socket => {

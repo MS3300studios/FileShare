@@ -13,7 +13,7 @@ export default function Navigation(){
     const userData = getUser();
 
     React.useEffect(() => {
-        fetch(`http://localhost:3000/users/userphoto/${userData._id}`, { headers: { Authorization: getToken() } }).then(resp => {
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/users/userphoto/${userData._id}`, { headers: { Authorization: getToken() } }).then(resp => {
             return resp.json();
         }).then(data => {
             setLoadingPhoto(false);
