@@ -13,7 +13,7 @@ export default function Navigation(){
     const userData = getUser();
 
     React.useEffect(() => {
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/users/userphoto/${userData._id}`, { headers: { Authorization: getToken() } }).then(resp => {
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/users/userphoto/${userData._id}`, { headers: { Authorization: getToken() } }).then(resp => {
             return resp.json();
         }).then(data => {
             setLoadingPhoto(false);
@@ -46,7 +46,7 @@ export default function Navigation(){
             case "logout":
                 localStorage.clear();
                 sessionStorage.clear();
-                window.location.reload();
+                window.location.replace(window.location.origin)
                 break;
             case "contacts":
                 navigate("/contacts");

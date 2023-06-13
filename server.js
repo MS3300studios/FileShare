@@ -8,11 +8,25 @@ require('dotenv').config()
 
 const PORT = 2305;
 const app = express();
-const socketCorsOptions = {
-    cors: true,
-    origin: ['*']
+const http = require('http');
+const { Server } = require('socket.io');
+const server = http.createServer(app);
+// const socketCorsOptions = {
+//     cors: true,
+//     origin: ['*'],
+//     path: '/api/'
     // origin: ['http://localhost:5173']
-}
+// }
+
+// const io = socket(server, socketCorsOptions);
+
+const io = new Server(server, {
+    cors: {
+        origin: '*',
+    },
+    path: '/20_strusinski/aplikacja/api',
+});
+
 // const serverCorsOptions = {
 //     origin: "http://localhost:5173"
 // }
@@ -25,16 +39,26 @@ app.use(cors());
 
 app.use(express.static(path.join(__dirname, 'assets')));
 
-const server = app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log('server is started')
 })
 
-const io = socket(server, socketCorsOptions);
+app.use('*', (req, res, next) => {
+    console.log('[DEBUG] ', req.originalUrl)
+    if (req.originalUrl.startsWith('/api/')) {
+        next();
+    } else {
+        res.sendFile(path.join(__dirname, 'index.html'))
+    }
+});
 
-app.get('/', (req, res) => {
-    // res.send('ok')
-    res.sendFile(path.join(__dirname, 'index.html'))
-})
+// app.get('/', (req, res) => {
+    //     res.sendFile(path.join(__dirname, 'index.html'))
+// })
+
+// app.get('/#/*', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'index.html'))
+// })
 
 app.get('/test', (req, res) => {
     res.send('ok test')

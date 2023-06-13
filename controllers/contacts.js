@@ -11,7 +11,7 @@ router.use(cors(serverCorsOptions));
 const Contacts = require("../models/ContactsList");
 const User = require('../models/User').User;
 
-router.get('/contacts', auth, (req, res) => {
+router.get('/api/contacts', auth, (req, res) => {
     Contacts.findOne({userId: req.userData.userId})
         .exec()
         .then(resp => {
@@ -34,7 +34,7 @@ router.get('/contacts', auth, (req, res) => {
         });
 });
 
-router.get('/contacts/people', auth, (req, res) => {
+router.get('/api/contacts/people', auth, (req, res) => {
     User.find()
         .exec()
         .then(async resp => {
@@ -65,7 +65,7 @@ router.get('/contacts/people', auth, (req, res) => {
         });
 });
 
-router.get('/contacts/add/:personId', auth, async (req, res) => {
+router.get('/api/contacts/add/:personId', auth, async (req, res) => {
     const userContacts = await Contacts.findOne({userId: req.userData.userId}).exec();
     let isPersonAlreadyInContacts = false;
     userContacts.contacts.forEach(contact => {
@@ -86,7 +86,7 @@ router.get('/contacts/add/:personId', auth, async (req, res) => {
     })    
 });
 
-router.get('/contacts/remove/:personId', auth, async (req, res) => {
+router.get('/api/contacts/remove/:personId', auth, async (req, res) => {
     const userContacts = await Contacts.findOne({userId: req.userData.userId}).exec();
     const newContacts = userContacts.contacts.filter(el => el._id.toString() !== req.params.personId)
     console.log(newContacts)
@@ -100,7 +100,7 @@ router.get('/contacts/remove/:personId', auth, async (req, res) => {
     });
 })
 
-router.get('/contacts/person/:query', auth, (req, res) => {
+router.get('/api/contacts/person/:query', auth, (req, res) => {
     if(req.params.query.indexOf("@") !== -1){
         User.find({"email": { $regex: req.params.query}}).exec().then(result => {
             let dtoArray = result.map(el => ({

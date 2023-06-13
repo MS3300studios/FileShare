@@ -16,7 +16,7 @@ export const Permissions = ({ contactId, contactNickname, seeAlreadySharedFiles 
     const [alteredFiles, setAlteredFiles] = React.useState<string[]>([]);
 
     React.useEffect(() => {
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/${seeAlreadySharedFiles ? "sharedWith" : "notSharedWith"}/${contactId}`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/files/${seeAlreadySharedFiles ? "sharedWith" : "notSharedWith"}/${contactId}`, 
             { headers: { Authorization: getToken() } 
         })
         .then(resp => resp.json())
@@ -33,7 +33,7 @@ export const Permissions = ({ contactId, contactNickname, seeAlreadySharedFiles 
         if(!id) return;
 
         if(seeAlreadySharedFiles){
-            fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/removeAccess`, 
+            fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/files/removeAccess`, 
                 { headers: { Authorization: getToken(), 'Content-Type': 'application/json' },
                 method: "POST",
                 body: JSON.stringify({ fileId: id, contactId: contactId })
@@ -47,7 +47,7 @@ export const Permissions = ({ contactId, contactNickname, seeAlreadySharedFiles 
                 alert('an unexpected error ocurred while processing the request. Please reload the page and try again.')
             })
         } else {
-            fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/share`, 
+            fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/files/share`, 
                 { headers: { Authorization: getToken(), 'Content-Type': 'application/json' },
                 method: "POST",
                 body: JSON.stringify({ fileId: id, contactId: contactId })

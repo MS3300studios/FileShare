@@ -24,7 +24,7 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
     const [nameWasEdited, setNameWasEdited] = React.useState(false);
 
     React.useEffect(() => {
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/participants/${file._id}`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/files/participants/${file._id}`, 
             { headers: { Authorization: getToken() }
         })
         .then(resp => resp.json())
@@ -38,7 +38,7 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
     }, [])
 
     const revokePermissionForUser = (userId: string) => {
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/removeAccess`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/files/removeAccess`, 
             { headers: { Authorization: getToken(), 'Content-Type': 'application/json' },
             method: "POST",
             body: JSON.stringify({ fileId: file._id, contactId: userId })
@@ -54,7 +54,7 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
     }
 
     const handleFileDownload = () => {
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/download/${file._id}`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/files/download/${file._id}`, 
             { headers: { Authorization: getToken() }
         })
         .then(response => {
@@ -77,7 +77,7 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
 
     const handleFileDeletion = () => {
         setLoadingDelete(true);
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/delete/${file._id}`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/files/delete/${file._id}`, 
             { headers: { Authorization: getToken() }
         })
         .then(response => {
@@ -96,7 +96,7 @@ const FileDetails = ({isModalOpened, closeModal, authorData, file}: IProps) => {
             return;
         }
 
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/edit`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/files/edit`, 
             { 
                 method: "POST", 
                 body: JSON.stringify({name: newFileName, fileId: file._id}), 

@@ -3,7 +3,7 @@ import styles from "./conversations.module.css";
 import { getToken } from "../../utils/getToken";
 import { DocumentCard, DocumentCardActivity, DocumentCardPreview, DocumentCardTitle, IDocumentCardPreviewProps, Spinner, SpinnerSize } from "@fluentui/react";
 import moment from "moment";
-import chatIconImage from "../../assets/chaticon.png";
+import chatIconImage from "../../assets/chatIcon";
 import { getUser } from "../../utils/getUser";
 import { useNavigate } from "react-router-dom";
 
@@ -70,7 +70,7 @@ const Conversations = () => {
     React.useEffect(() => {
         const token = getToken();
 
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/conversations`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/conversations`, 
             { headers: { Authorization: token }
         })
         .then(response => {

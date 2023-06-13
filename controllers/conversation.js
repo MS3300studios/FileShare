@@ -12,7 +12,7 @@ router.use(cors(serverCorsOptions));
 const Conversation = require("../models/Chat").Conversation;
 const User = require('../models/User').User;
 
-router.get('/conversations', auth, (req, res) => {
+router.get('/api/conversations', auth, (req, res) => {
     Conversation.find().exec().then(convs => {
 
         const userParticipatingConvs = convs.filter(conv => {
@@ -37,7 +37,7 @@ router.get('/conversations', auth, (req, res) => {
     })
 })
 
-router.get('/conversation/:secondId', auth, (req, res) => {
+router.get('/api/conversation/:secondId', auth, (req, res) => {
     if(!mongoose.Types.ObjectId.isValid(req.params.secondId)){
         console.log('incorrect id format')
         res.status(400).json({error: "provided user id is not a correct mongoose.ObjectId"})

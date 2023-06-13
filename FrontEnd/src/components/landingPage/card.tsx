@@ -1,11 +1,11 @@
 import * as React from "react";
 import moment from "moment";
 import { DocumentCard, DocumentCardActivity, DocumentCardPreview, DocumentCardTitle, IDocumentCardPreviewProps, ImageFit, Spinner, SpinnerSize } from "@fluentui/react";
-import unknownImage from "../../assets/unknown.png";
-import archiveImage from "../../assets/archive.png";
-import photoImage from "../../assets/photo.png";
-import textImage from "../../assets/text.png";
-import documentImage from "../../assets/document.png";
+import unknownImage from "../../assets/unknown";
+import archiveImage from "../../assets/archive";
+import photoImage from "../../assets/photo";
+import textImage from "../../assets/text";
+import documentImage from "../../assets/document";
 import { getToken } from "../../utils/getToken";
 
 interface ICardProps{
@@ -64,7 +64,7 @@ export default function Card({ id, userId, name, size, uploadedAt, ext, docType,
     });
 
     React.useEffect(() => {
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/users/getUser/${userId}`,
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/users/getUser/${userId}`,
             { headers: { Authorization: getToken() } 
         }).then(resp => resp.json()).then(data => {
             setIsLoadingUser(false);

@@ -11,7 +11,7 @@ const mongoose = require("mongoose");
 
 router.use(cors());
 
-router.post('/files/add', auth, upload.single('file'), (req, res) => {
+router.post('/api/files/add', auth, upload.single('file'), (req, res) => {
     if(!req.file){
         res.sendStatus(400)
     }
@@ -32,7 +32,7 @@ router.post('/files/add', auth, upload.single('file'), (req, res) => {
     });
 })
 
-router.get('/files', auth, (req, res) => {
+router.get('/api/files', auth, (req, res) => {
     File.find({ userId: req.userData.userId }).exec().then(files => {
         res.status(200).json({ files: files })
     }).catch(err => {
@@ -41,7 +41,7 @@ router.get('/files', auth, (req, res) => {
     });
 })
 
-router.get('/files/notSharedWith/:contactId', auth, (req, res) => {
+router.get('/api/files/notSharedWith/:contactId', auth, (req, res) => {
     File.find({ userId: req.userData.userId }).exec().then(files => {
         const filteredFiles = files.filter(el => {
             const participantsIds = el.participants.map(el => el._id.toString())
@@ -55,7 +55,7 @@ router.get('/files/notSharedWith/:contactId', auth, (req, res) => {
     });
 })
 
-router.get('/files/sharedWith/:contactId', auth, (req, res) => {
+router.get('/api/files/sharedWith/:contactId', auth, (req, res) => {
     File.find({ userId: req.userData.userId }).exec().then(files => {
         const filteredFiles = files.filter(el => {
             const participantsIds = el.participants.map(el => el._id.toString())
@@ -70,7 +70,7 @@ router.get('/files/sharedWith/:contactId', auth, (req, res) => {
 })
 
 //get all files that are shared with the user (where he is a participant for a file)
-router.get('/files/shared', auth, (req, res) => {
+router.get('/api/files/shared', auth, (req, res) => {
     File.find().exec().then(allFiles => {
         const userFiles = allFiles.filter(file => {
             const participantsIds = file.participants.map(participant => participant._id.toString());
@@ -86,7 +86,7 @@ router.get('/files/shared', auth, (req, res) => {
     })
 })
 
-router.get('/files/shared/remove/:fileId', auth, (req, res) => {
+router.get('/api/files/shared/remove/:fileId', auth, (req, res) => {
     if(!mongoose.Types.ObjectId.isValid(req.params.fileId)){
         res.sendStatus(400);
     };
@@ -102,7 +102,7 @@ router.get('/files/shared/remove/:fileId', auth, (req, res) => {
     });
 })
 
-router.get('/files/download/:fileId', auth, async (req, res) => {
+router.get('/api/files/download/:fileId', auth, async (req, res) => {
     const file = await File.findById(req.params.fileId).exec();
     const fileParticipants = file.participants.map(par => par._id.toString())
 
@@ -112,7 +112,7 @@ router.get('/files/download/:fileId', auth, async (req, res) => {
         res.sendStatus(401)
 })
 
-router.get('/files/delete/:fileId', auth, async (req, res) => {
+router.get('/api/files/delete/:fileId', auth, async (req, res) => {
     const file = await File.findById(req.params.fileId).exec();
     if(file.userId !== req.userData.userId){
         res.sendStatus(401);
@@ -136,7 +136,7 @@ router.get('/files/delete/:fileId', auth, async (req, res) => {
     });
 })
 
-router.post('/files/edit', auth, async (req, res) => {
+router.post('/api/files/edit', auth, async (req, res) => {
     const file = await File.findById(req.body.fileId).exec();
 
     if(file.userId !== req.userData.userId){
@@ -153,7 +153,7 @@ router.post('/files/edit', auth, async (req, res) => {
     })
 })
 
-router.get('/files/participants/:fileId', auth, async (req, res) => {
+router.get('/api/files/participants/:fileId', auth, async (req, res) => {
     const file = await File.findById(req.params.fileId).exec();
     if(file.userId !== req.userData.userId){
         res.sendStatus(401);
@@ -163,7 +163,7 @@ router.get('/files/participants/:fileId', auth, async (req, res) => {
     res.status(200).json(file.participants)
 })
 
-router.post('/files/share', auth, async (req, res) => {
+router.post('/api/files/share', auth, async (req, res) => {
     try{
         const file = await File.findById(req.body.fileId).exec();
         //check if the author of the request is the owner of this file
@@ -193,7 +193,7 @@ router.post('/files/share', auth, async (req, res) => {
     }
 })
 
-router.post('/files/removeAccess', auth, async (req, res) => {
+router.post('/api/files/removeAccess', auth, async (req, res) => {
     try{
         const file = await File.findById(req.body.fileId).exec();
         //check if the author of the request is the owner of this file

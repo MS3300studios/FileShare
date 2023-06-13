@@ -79,7 +79,7 @@ export default function AddFile(){
         formData.append("type", selectedType);
         formData.append("name", file.name);
 
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files/add`, { 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/files/add`, { 
             method: "POST",
             headers: { Authorization: getToken() },
             body: formData

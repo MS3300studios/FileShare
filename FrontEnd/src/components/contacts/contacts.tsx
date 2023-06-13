@@ -38,7 +38,7 @@ export default function Contacts(){
 
     const getUserContacts = () => {
         setIsLoading(true);
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/contacts`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/contacts`, 
             { headers: { Authorization: getToken() } 
         })
         .then(resp => resp.json())
@@ -53,7 +53,7 @@ export default function Contacts(){
 
     const getRandomContacts = () => {
         setLoadingPeople(true);
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/contacts/people`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/contacts/people`, 
             { headers: { Authorization: getToken() } 
         }).then(resp => {
             return resp.json()
@@ -70,7 +70,7 @@ export default function Contacts(){
     const addPerson = (personId: string) => {
         setIsLoadingAddPerson(personId);
 
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/contacts/add/${personId}`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/contacts/add/${personId}`, 
             { headers: { Authorization: getToken() } 
         })
         .then(resp => {
@@ -105,7 +105,7 @@ export default function Contacts(){
         const token = getToken();
 
         setIsLoadingRemove(personId);
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/contacts/remove/${personId}`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/contacts/remove/${personId}`, 
             { headers: { Authorization: token } 
         }).then(resp => {
             return resp.json()
@@ -121,7 +121,7 @@ export default function Contacts(){
     const searchForUser = () => {
         setMessageBar({show: true, type: MessageBarType.info, text: "loading..."})
         const token = getToken();
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/contacts/person/${searchString}`, 
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/contacts/person/${searchString}`, 
             { headers: { Authorization: token } 
         }).then(resp => {
             return resp.json()

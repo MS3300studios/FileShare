@@ -28,7 +28,7 @@ const EditProfile: React.FC = () => {
             email,
         };
         
-        fetch('https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/user/edit', {
+        fetch('https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/user/edit', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ const EditProfile = () => {
   
 
   React.useEffect(() => {
-      fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/users/userPhoto/${userData._id}`, {
+      fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/users/userPhoto/${userData._id}`, {
           headers: { Authorization: getToken() }
       }).then((resp) => {
           return resp.json();
@@ -153,7 +153,7 @@ const EditProfile = () => {
     setMessageBar({show: false, type: MessageBarType.warning, text: "No information was edited"})
     setProcessingRequest(true);
 
-    fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/users/edit`, {
+    fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/users/edit`, {
         headers: { "Authorization": getToken(), 'Content-Type': 'application/json' },
         method: "post",
         body: JSON.stringify({

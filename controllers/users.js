@@ -13,7 +13,7 @@ const User = require("../models/User").User;
 const Contacts = require("../models/ContactsList");
 const { Conversation } = require('../models/Chat');
 
-router.get('/users/verifyToken/:token', (req, res) => {
+router.get('/api/users/verifyToken/:token', (req, res) => {
     try{
         const decoded = jwt.decode(req.params.token, process.env.SECRET);
         const expDate = new Date(decoded.exp * 1000);
@@ -28,7 +28,7 @@ router.get('/users/verifyToken/:token', (req, res) => {
     }
 });
 
-router.post('/users/register', (req, res) => {
+router.post('/api/users/register', (req, res) => {
     if(req.body.nickname.length > 21){
         res.status(400).json({
             error: "invalid nickname length"
@@ -69,7 +69,7 @@ router.post('/users/register', (req, res) => {
     });
 });
 
-router.post('/users/login', (req, res) => {
+router.post('/api/users/login', (req, res) => {
     User.find({email: req.body.email})
         .exec()
         .then(users => {
@@ -115,7 +115,7 @@ router.post('/users/login', (req, res) => {
 });
 
 
-router.get('/users/getUser/:userId', auth, (req, res) => {
+router.get('/api/users/getUser/:userId', auth, (req, res) => {
     User.findById(req.params.userId)
         .exec()
         .then(user => {
@@ -131,7 +131,7 @@ router.get('/users/getUser/:userId', auth, (req, res) => {
         })
 })
 
-router.get('/users/userphoto/:userId', auth, (req, res) => {
+router.get('/api/users/userphoto/:userId', auth, (req, res) => {
     User.findById(req.params.userId)
         .exec()
         .then(user => {
@@ -142,7 +142,7 @@ router.get('/users/userphoto/:userId', auth, (req, res) => {
         })
 })
 
-router.post('/users/edit', auth, (req, res) => {
+router.post('/api/users/edit', auth, (req, res) => {
     User.findById(req.userData.userId).exec().then(async user => {
         let nickNameTaken = false;
         let emailTaken = false;

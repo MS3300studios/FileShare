@@ -2,7 +2,7 @@ import * as React from "react";
 import Navigation from './components/navigation/nav';
 import LandingPage from './components/landingPage/landingPage';
 import './App.css'
-import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import AddFile from './components/addFile/addFile';
 import { Login } from './components/login/login';
 import { MessageBar, MessageBarType, Spinner, SpinnerSize, initializeIcons } from '@fluentui/react';
@@ -14,10 +14,9 @@ import Shared from "./components/shared/shared";
 import Chat, { ISocketMessage } from "./components/chat/chat";
 import Conversations from "./components/conversations/conversations";
 import io from 'socket.io-client';
+import { getUser } from "./utils/getUser";
 
-const socket = io("https://limba.wzks.uj.edu.pl", {
-  path: "/20_strusinski/aplikacja"
-});
+const socket = io("https://filesharebackend-ljml.onrender.com")
 
 interface IConversationInfo{
   show: boolean;
@@ -40,7 +39,7 @@ function App() {
       setIsLoggedIn(false)
       return;
     }
-    fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/users/verifyToken/${token}`).then(resp => {
+    fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/users/verifyToken/${token}`).then(resp => {
       if(resp.status === 200) {
         setLoadingIsLoggedIn(false);
         setIsLoggedIn(true)
@@ -53,7 +52,7 @@ function App() {
       }
     }).catch(err => setMessageBar({show: true, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"}))
 
-    fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
+    fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
       return resp.json()
     }).then(data => {
       setConversations(data)
@@ -67,13 +66,30 @@ function App() {
 
   React.useEffect(() => {
     if(!loadingConversations){
+      const userData = getUser();
+      if(userData){
+        socket.emit("userChannel", { userId: userData._id })
+      }
       conversations.forEach(conv => {
         socket.emit('join', { conversationId: (conv as any)._id });
+      })
+
+      socket.on("newConversation", (data: { message: ISocketMessage, newConvId: string }) => {
+        if(!window.location.href.includes("chat")){
+          setConversationInfo({show: true, messageData: data.message})
+          setTimeout(() => {
+            setConversationInfo({show: false, messageData: data.message})
+          }, 5300);
+        }
+        socket.emit('join', { conversationId: data.newConvId });
       })
 
       socket.on("receiveMessage", (message: ISocketMessage) => {
         if(!window.location.href.includes("chat")){
           setConversationInfo({show: true, messageData: message})
+          setTimeout(() => {
+            setConversationInfo({show: false, messageData: message})
+          }, 5300);
         }
 
         // setConversationInfo({show: true, messageData: message})
@@ -84,6 +100,7 @@ function App() {
     }
 
     return () => {
+      socket.off("newConversation");
       socket.off("receiveMessage");
     };
   }, [loadingConversations])
@@ -92,12 +109,13 @@ function App() {
   //   console.log('loading conversation new')
 
   //   setLoadingConversations(true);
-  //   fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
+  //   fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/conversations`, { headers: { Authorization: getToken() } }).then(resp => {
   //     return resp.json()
   //   }).then(data => {
   //     setConversations(data)
   //     setLoadingConversations(false)
   //   }).catch(err => {
+  
   //     setMessageBar({show: true, type: MessageBarType.error, text: "an error occurred, please reload the page and try again"})
   //     alert("an error occurred, please reload the page and try again")
   //     console.log(err)
@@ -121,7 +139,7 @@ function App() {
           { converationInfo.show &&
               <div className="slideIn">
                 <b>User <span style={{textDecoration: "underline"}}>{converationInfo.messageData.message.authorNickname}</span> has written to you</b>
-                <p>{converationInfo.messageData.message.text}</p>
+                <p>{converationInfo.messageData.message.text} </p>
               </div>
           }
           {

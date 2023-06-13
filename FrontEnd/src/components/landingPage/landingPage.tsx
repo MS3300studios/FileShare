@@ -17,7 +17,7 @@ export default function LandingPage(){
     const [sortAscending, setSortAscending] = React.useState(true);
 
     React.useEffect(() => {
-        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files`, { headers: { Authorization: getToken() } }).then(resp => {
+        fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/files`, { headers: { Authorization: getToken() } }).then(resp => {
             return resp.json();
         }).then(data => {
             setIsLoading(false);
@@ -46,7 +46,7 @@ export default function LandingPage(){
         setIsModalOpened(false);
         setOpenedFileId("");
         if(reload){
-            fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/files`, { headers: { Authorization: getToken() } }).then(resp => {
+            fetch(`https://limba.wzks.uj.edu.pl/20_strusinski/aplikacja/api/files`, { headers: { Authorization: getToken() } }).then(resp => {
                 return resp.json();
             }).then(data => {
                 setIsLoading(false);
